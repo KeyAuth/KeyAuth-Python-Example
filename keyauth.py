@@ -79,22 +79,22 @@ class api:
             print("Logged in")
         if response == "KeyAuth_Invalid":
             print("Key not found")
-	    if os.path.exists("C:\\ProgramData\\keysave.txt"):
+	    if os.path.exists('C:\\ProgramData\\keysave.txt'):
   	        os.remove("C:\\ProgramData\\keysave.txt")
                 sys.exit()
         if response == "KeyAuth_InvalidHWID":
             print("This computer doesn't match the computer the key is locked to. If you reset your computer, contact the application owner")
-	    if os.path.exists("C:\\ProgramData\\keysave.txt"):
+	    if os.path.exists('C:\\ProgramData\\keysave.txt'):
   	        os.remove("C:\\ProgramData\\keysave.txt")
                 sys.exit()
         if response == "KeyAuth_Expired":
             print("This key is expired")
-	    if os.path.exists("C:\\ProgramData\\keysave.txt"):
+	    if os.path.exists('C:\\ProgramData\\keysave.txt'):
                 os.remove("C:\\ProgramData\\keysave.txt")
                 sys.exit()
         else:
             print("Application Failed To Connect. Try again or contact application owner")
-	    if os.path.exists("C:\\ProgramData\\keysave.txt"):
+	    if os.path.exists('C:\\ProgramData\\keysave.txt'):
   	        os.remove("C:\\ProgramData\\keysave.txt")
                 sys.exit()
         
