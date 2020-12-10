@@ -13,9 +13,17 @@ from Crypto.Hash import SHA256
 from Crypto.Util.Padding import pad, unpad
 # aes + padding, sha256
 
-import webbrowser, platform, subprocess, datetime
+import webbrowser
+import platform
+import subprocess
+import datetime
+import sys
 
 from requests_toolbelt.adapters.fingerprint import FingerprintAdapter
+
+
+KEYSAVE_PATH = "C:\\ProgramData\\keysave.txt"
+
 
 class api:
     name = ownerid = secret = ""
@@ -35,9 +43,9 @@ class api:
         init_iv = SHA256.new(self.session_iv.encode()).hexdigest()
 
         post_data = {
-	        "type": binascii.hexlify(("init").encode()),
+            "type": binascii.hexlify(("init").encode()),
             "name": binascii.hexlify(self.name.encode()),
-	        "ownerid": binascii.hexlify(self.ownerid.encode()),
+            "ownerid": binascii.hexlify(self.ownerid.encode()),
             "init_iv": init_iv
         }
 
@@ -53,58 +61,55 @@ class api:
         else:
             print("The program key you tried to use doesn't exist")
             sys.exit()
-        
 
     def login(self, key, hwid=None):
-        if hwid is None: hwid = others.get_hwid()
-        
+        if hwid is None:
+            hwid = others.get_hwid()
+
         self.session_iv = str(uuid4())[:8]
 
         init_iv = SHA256.new(self.session_iv.encode()).hexdigest()
 
         post_data = {
-	        "type": binascii.hexlify(("login").encode()),
+            "type": binascii.hexlify(("login").encode()),
             "key": encryption.encrypt(key, self.secret, init_iv),
             "hwid": encryption.encrypt(hwid, self.secret, init_iv),
             "name": binascii.hexlify(self.name.encode()),
-	        "ownerid": binascii.hexlify(self.ownerid.encode()),
+            "ownerid": binascii.hexlify(self.ownerid.encode()),
             "init_iv": init_iv
         }
 
         response = self.__do_request(post_data)
-        
+
         response = encryption.decrypt(response, self.secret, init_iv)
-        
+
         if response == "KeyAuth_Valid":
             print("Logged in")
         if response == "KeyAuth_Invalid":
             print("Key not found")
-	    if os.path.exists('C:\\ProgramData\\keysave.txt'):
-  	        os.remove("C:\\ProgramData\\keysave.txt")
+            if os.path.exists(KEYSAVE_PATH):
+                os.remove(KEYSAVE_PATH)
                 sys.exit()
         if response == "KeyAuth_InvalidHWID":
             print("This computer doesn't match the computer the key is locked to. If you reset your computer, contact the application owner")
-	    if os.path.exists('C:\\ProgramData\\keysave.txt'):
-  	        os.remove("C:\\ProgramData\\keysave.txt")
+            if os.path.exists(KEYSAVE_PATH):
+                os.remove(KEYSAVE_PATH)
                 sys.exit()
         if response == "KeyAuth_Expired":
             print("This key is expired")
-	    if os.path.exists('C:\\ProgramData\\keysave.txt'):
-                os.remove("C:\\ProgramData\\keysave.txt")
+            if os.path.exists(KEYSAVE_PATH):
+                os.remove(KEYSAVE_PATH)
                 sys.exit()
         else:
             print("Application Failed To Connect. Try again or contact application owner")
-	    if os.path.exists('C:\\ProgramData\\keysave.txt'):
-  	        os.remove("C:\\ProgramData\\keysave.txt")
+            if os.path.exists(KEYSAVE_PATH):
+                os.remove(KEYSAVE_PATH)
                 sys.exit()
-        
 
     def __do_request(self, post_data):
         headers = {"User-Agent": "KeyAuth"}
 
-        rq = requests.Session()
-
-        rq_out = rq.post(
+        rq_out = requests.post(
             "https://keyauth.com/api/", data=post_data, headers=headers, verify=False
         )
 
@@ -117,9 +122,10 @@ class others:
         if platform.system() != "Windows":
             return "None"
 
-        cmd = subprocess.Popen("wmic useraccount where name='%username%' get sid", stdout=subprocess.PIPE, shell=True)
+        cmd = subprocess.Popen(
+            "wmic useraccount where name='%username%' get sid", stdout=subprocess.PIPE, shell=True)
 
-        (suppost_sid, error) = cmd.communicate()
+        (suppost_sid, _error) = cmd.communicate()
 
         suppost_sid = suppost_sid.split(b'\n')[1].strip()
 
