@@ -85,17 +85,17 @@ class api:
 
         if response == "KeyAuth_Valid":
             print("Logged in")
-        if response == "KeyAuth_Invalid":
+        elif response == "KeyAuth_Invalid":
             print("Key not found")
             if os.path.exists(KEYSAVE_PATH):
                 os.remove(KEYSAVE_PATH)
                 sys.exit()
-        if response == "KeyAuth_InvalidHWID":
+        elif response == "KeyAuth_InvalidHWID":
             print("This computer doesn't match the computer the key is locked to. If you reset your computer, contact the application owner")
             if os.path.exists(KEYSAVE_PATH):
                 os.remove(KEYSAVE_PATH)
                 sys.exit()
-        if response == "KeyAuth_Expired":
+        elif response == "KeyAuth_Expired":
             print("This key is expired")
             if os.path.exists(KEYSAVE_PATH):
                 os.remove(KEYSAVE_PATH)

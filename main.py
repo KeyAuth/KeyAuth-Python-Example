@@ -12,7 +12,7 @@ keyauthapp.init()
 
 if os.path.exists(KEYSAVE_PATH):
     with open (KEYSAVE_PATH, "r") as file:
-        data = file.readlines()
+        data = file.readline()
     keyauthapp.login(data)
 else:
     key = input('Enter your key: ')
