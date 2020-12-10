@@ -8,7 +8,7 @@ keyauthapp = api("your app name here", "your ownerid here", "your app secret her
 print("Initializing")
 keyauthapp.init()
 
-if os.path.exists(file_path):
+if os.path.exists('C:\\ProgramData\\keysave.txt'):
     with open ("C:\\ProgramData\\keysave.txt", "r") as file:
     data=file.readlines()
     keyauthapp.login(data)
