@@ -2,8 +2,12 @@ from keyauth import api
 
 import os
 import os.path
+import platform
 
-KEYSAVE_PATH = "C:\\ProgramData\\keysave.txt"
+if platform.system() == "Windows":
+    KEYSAVE_PATH = "C:\\ProgramData\\keysave.txt"
+else:
+    KEYSAVE_PATH = "/usr/keysave.txt"
 
 keyauthapp = api("your app name here", "your ownerid here", "your app secret here")
 
