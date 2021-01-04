@@ -21,8 +21,10 @@ import sys
 
 from requests_toolbelt.adapters.fingerprint import FingerprintAdapter
 
-
-KEYSAVE_PATH = "C:\\ProgramData\\keysave.txt"
+if platform.system() == "Windows":
+    KEYSAVE_PATH = "C:\\ProgramData\\keysave.txt"
+else:
+    KEYSAVE_PATH = "/usr/keysave.txt"
 
 
 class api:
@@ -110,7 +112,7 @@ class api:
         headers = {"User-Agent": "KeyAuth"}
 
         rq_out = requests.post(
-            "https://keyauth.com/api/", data=post_data, headers=headers, verify=False
+            "https://keyauth.com/api/", data=post_data, headers=headers, verify="keyauth.pem"
         )
 
         return rq_out.text
