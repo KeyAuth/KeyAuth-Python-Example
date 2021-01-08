@@ -1,5 +1,3 @@
-import os
-
 import json  # json
 
 import binascii  # hex encoding
@@ -13,11 +11,7 @@ from Crypto.Hash import SHA256
 from Crypto.Util.Padding import pad, unpad
 # aes + padding, sha256
 
-import webbrowser
-import platform
-import subprocess
-import datetime
-import sys
+import webbrowser, platform, subprocess, datetime, datetime, sys
 
 from requests_toolbelt.adapters.fingerprint import FingerprintAdapter
 
@@ -53,21 +47,21 @@ class api:
 
         response = self.__do_request(post_data)
 
+        if response == "program_doesnt_exist":
+            print("The application doesnt exist")
+            sys.exit()
+
         response = encryption.decrypt(response, self.secret, init_iv)
 
-        if response == "KeyAuth_Disabled":
-            print("The program key you tried to use doesn't exist")
-            sys.exit()
-        if response == "KeyAuth_Initialized":
-            print("Initialized")
-        else:
-            print("The program key you tried to use doesn't exist")
+        json = json.loads(response)
+
+        if not json["success"]:
+            print(json["message"])
             sys.exit()
 
     def login(self, key, hwid=None):
-        if hwid is None:
-            hwid = others.get_hwid()
-
+        if hwid is None: hwid = others.get_hwid()
+        
         self.session_iv = str(uuid4())[:8]
 
         init_iv = SHA256.new(self.session_iv.encode()).hexdigest()
@@ -85,25 +79,12 @@ class api:
 
         response = encryption.decrypt(response, self.secret, init_iv)
 
-        if response == "KeyAuth_Valid":
-            print("Logged in")
-        elif response == "KeyAuth_Invalid":
-            print("Key not found")
-            if os.path.exists(KEYSAVE_PATH):
-                os.remove(KEYSAVE_PATH)
-                sys.exit()
-        elif response == "KeyAuth_InvalidHWID":
-            print("This computer doesn't match the computer the key is locked to. If you reset your computer, contact the application owner")
-            if os.path.exists(KEYSAVE_PATH):
-                os.remove(KEYSAVE_PATH)
-                sys.exit()
-        elif response == "KeyAuth_Expired":
-            print("This key is expired")
-            if os.path.exists(KEYSAVE_PATH):
-                os.remove(KEYSAVE_PATH)
-                sys.exit()
+        json = json.loads(response)
+
+        if json["success"]:
+            self.__load_user_data(json["info"])
         else:
-            print("Application Failed To Connect. Try again or contact application owner")
+            print(json["message"])
             if os.path.exists(KEYSAVE_PATH):
                 os.remove(KEYSAVE_PATH)
                 sys.exit()
@@ -112,10 +93,25 @@ class api:
         headers = {"User-Agent": "KeyAuth"}
 
         rq_out = requests.post(
-            "https://keyauth.com/api/", data=post_data, headers=headers, verify="keyauth.pem"
+            "https://keyauth.com/api/v2/", data=post_data, headers=headers, verify="keyauth.pem"
         )
 
         return rq_out.text
+
+    # region user_data
+    class user_data_class:
+        key = ""
+        expiry = datetime.datetime.now()
+        level = 0
+
+    user_data = user_data_class()
+
+    def __load_user_data(self, data):
+        self.user_data.key = data["key"]
+
+        self.user_data.expiry = datetime.datetime.fromtimestamp(int(data["expiry"]))
+
+        self.user_data.level = data["level"]
 
 
 class others:
@@ -124,10 +120,9 @@ class others:
         if platform.system() != "Windows":
             return "None"
 
-        cmd = subprocess.Popen(
-            "wmic useraccount where name='%username%' get sid", stdout=subprocess.PIPE, shell=True)
+        cmd = subprocess.Popen("wmic useraccount where name='%username%' get sid", stdout=subprocess.PIPE, shell=True)
 
-        (suppost_sid, _error) = cmd.communicate()
+        (suppost_sid, error) = cmd.communicate()
 
         suppost_sid = suppost_sid.split(b'\n')[1].strip()
 
@@ -164,7 +159,7 @@ class encryption:
 
             return encryption.encrypt_string(message.encode(), _key.encode(), _iv.encode()).decode()
         except:
-            print("Invalid App Secret")
+            print("Invalid Application Information. Long text is secret short text is ownerid. Name is supposed to be app name not username")
             sys.exit()
 
     @staticmethod
@@ -176,5 +171,5 @@ class encryption:
 
             return encryption.decrypt_string(message.encode(), _key.encode(), _iv.encode()).decode()
         except:
-            print("Invalid App Secret")
+            print("Invalid Application Information. Long text is secret short text is ownerid. Name is supposed to be app name not username")
             sys.exit()
