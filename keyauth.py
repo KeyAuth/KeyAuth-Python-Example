@@ -1,4 +1,4 @@
-import json  # json
+import json as jsond  # json
 
 import binascii  # hex encoding
 
@@ -53,7 +53,7 @@ class api:
 
         response = encryption.decrypt(response, self.secret, init_iv)
 
-        json = json.loads(response)
+        json = jsond.loads(response)
 
         if not json["success"]:
             print(json["message"])
@@ -79,7 +79,7 @@ class api:
 
         response = encryption.decrypt(response, self.secret, init_iv)
 
-        json = json.loads(response)
+        json = jsond.loads(response)
 
         if json["success"]:
             self.__load_user_data(json["info"])
