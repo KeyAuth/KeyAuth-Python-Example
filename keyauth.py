@@ -1,5 +1,7 @@
 import json as jsond  # json
 
+import time
+
 import binascii  # hex encoding
 
 import requests  # https requests
@@ -87,6 +89,7 @@ class api:
             print(json["message"])
             if os.path.exists(KEYSAVE_PATH):
                 os.remove(KEYSAVE_PATH)
+                time.sleep(5)
             sys.exit()
 
     def __do_request(self, post_data):
