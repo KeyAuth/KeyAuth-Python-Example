@@ -87,7 +87,7 @@ class api:
             print(json["message"])
             if os.path.exists(KEYSAVE_PATH):
                 os.remove(KEYSAVE_PATH)
-                sys.exit()
+            sys.exit()
 
     def __do_request(self, post_data):
         headers = {"User-Agent": "KeyAuth"}
