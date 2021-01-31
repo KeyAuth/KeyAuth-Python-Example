@@ -11,7 +11,7 @@ from Crypto.Hash import SHA256
 from Crypto.Util.Padding import pad, unpad
 # aes + padding, sha256
 
-import webbrowser, platform, subprocess, datetime, datetime, sys
+import webbrowser, platform, subprocess, datetime, datetime, sys, os
 
 from requests_toolbelt.adapters.fingerprint import FingerprintAdapter
 
