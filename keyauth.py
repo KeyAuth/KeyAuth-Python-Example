@@ -206,7 +206,7 @@ class api:
         json = jsond.loads(response)
 
         if json["success"]:
-            return decoded_response["response"]
+            return json["response"]
         else:
             print(json["message"])
             time.sleep(5)
