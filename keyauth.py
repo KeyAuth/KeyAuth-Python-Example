@@ -181,7 +181,37 @@ class api:
                 os.remove(KEYSAVE_PATH)
                 time.sleep(5)
             sys.exit()
+            
+    def var(self, name, hwid=None):
+        if hwid is None: hwid = others.get_hwid()
+        
+        self.session_iv = str(uuid4())[:8]
 
+        init_iv = SHA256.new(self.session_iv.encode()).hexdigest()
+
+        post_data = {
+            "type": binascii.hexlify(("var").encode()),
+            "key": encryption.encrypt(self.user_data.key, self.secret, init_iv),
+            "varid": encryption.encrypt(name, self.secret, init_iv),
+            "hwid": encryption.encrypt(hwid, self.secret, init_iv),
+            "name": binascii.hexlify(self.name.encode()),
+            "ownerid": binascii.hexlify(self.ownerid.encode()),
+            "init_iv": init_iv
+        }
+
+        response = self.__do_request(post_data)
+
+        response = encryption.decrypt(response, self.secret, init_iv)
+
+        json = jsond.loads(response)
+
+        if json["success"]:
+            return decoded_response["response"]
+        else:
+            print(json["message"])
+            time.sleep(5)
+            sys.exit()
+            
     def __do_request(self, post_data):
         headers = {"User-Agent": "KeyAuth"}
 
