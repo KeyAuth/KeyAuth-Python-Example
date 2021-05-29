@@ -1,7 +1,13 @@
 # KeyAuth-Python-Example
 KeyAuth Python Example For The https://keyauth.com Authentication system.
 
-Install requirements, Update 3 values in main.py and you're ready!
+open cmd
+
+cd to the directory of the files
+
+Do the command `pip install -r requirements.txt` in same cmd
+
+Update 3 values in main.py and you're ready!
 
 **What is KeyAuth?**
 
