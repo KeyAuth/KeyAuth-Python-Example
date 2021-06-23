@@ -1,6 +1,6 @@
 import json as jsond  # json
 
-import time
+import time # sleep before exit
 
 import binascii  # hex encoding
 
@@ -17,11 +17,6 @@ import webbrowser, platform, subprocess, datetime, datetime, sys, os
 
 from requests_toolbelt.adapters.fingerprint import FingerprintAdapter
 
-if platform.system() == "Windows":
-    KEYSAVE_PATH = "C:\\ProgramData\\keysave.txt"
-else:
-    KEYSAVE_PATH = "/usr/keysave.txt"
-
 
 class api:
     name = ownerid = secret = version = ""
@@ -35,16 +30,18 @@ class api:
         
         self.version = version
 
-    session_id = session_iv = ""
+    sessionid = enckey = ""
 
     def init(self):
-        self.session_iv = str(uuid4())[:8]
 
-        init_iv = SHA256.new(self.session_iv.encode()).hexdigest()
+        init_iv = SHA256.new(str(uuid4())[:8].encode()).hexdigest()
+
+        self.enckey = SHA256.new(str(uuid4())[:8].encode()).hexdigest()
 
         post_data = {
             "type": binascii.hexlify(("init").encode()),
             "ver": encryption.encrypt(self.version, self.secret, init_iv),
+            "enckey": encryption.encrypt(self.enckey, self.secret, init_iv),
             "name": binascii.hexlify(self.name.encode()),
             "ownerid": binascii.hexlify(self.ownerid.encode()),
             "init_iv": init_iv
@@ -52,31 +49,32 @@ class api:
 
         response = self.__do_request(post_data)
 
-        if response == "program_doesnt_exist":
-            print("The application doesnt exist")
+        if response == "KeyAuth_Invalid":
+            print("The application doesn't exist")
             sys.exit()
 
         response = encryption.decrypt(response, self.secret, init_iv)
-
+        print(response)
         json = jsond.loads(response)
 
         if not json["success"]:
             print(json["message"])
             sys.exit()
+
+        self.sessionid = json["sessionid"]
             
     def register(self, user, password, license, hwid=None):
         if hwid is None: hwid = others.get_hwid()
         
-        self.session_iv = str(uuid4())[:8]
-
-        init_iv = SHA256.new(self.session_iv.encode()).hexdigest()
+        init_iv = SHA256.new(str(uuid4())[:8].encode()).hexdigest()
 
         post_data = {
             "type": binascii.hexlify(("register").encode()),
-            "username": encryption.encrypt(user, self.secret, init_iv),
-            "pass": encryption.encrypt(password, self.secret, init_iv),
-            "key": encryption.encrypt(license, self.secret, init_iv),
-            "hwid": encryption.encrypt(hwid, self.secret, init_iv),
+            "username": encryption.encrypt(user, self.enckey, init_iv),
+            "pass": encryption.encrypt(password, self.enckey, init_iv),
+            "key": encryption.encrypt(license, self.enckey, init_iv),
+            "hwid": encryption.encrypt(hwid, self.enckey, init_iv),
+            "sessionid": binascii.hexlify(self.sessionid.encode()),
             "name": binascii.hexlify(self.name.encode()),
             "ownerid": binascii.hexlify(self.ownerid.encode()),
             "init_iv": init_iv
@@ -84,7 +82,7 @@ class api:
 
         response = self.__do_request(post_data)
 
-        response = encryption.decrypt(response, self.secret, init_iv)
+        response = encryption.decrypt(response, self.enckey, init_iv)
 
         json = jsond.loads(response)
 
@@ -96,14 +94,13 @@ class api:
             
     def upgrade(self, user, license):
         
-        self.session_iv = str(uuid4())[:8]
-
-        init_iv = SHA256.new(self.session_iv.encode()).hexdigest()
+        init_iv = SHA256.new(str(uuid4())[:8].encode()).hexdigest()
 
         post_data = {
             "type": binascii.hexlify(("upgrade").encode()),
-            "username": encryption.encrypt(user, self.secret, init_iv),
-            "key": encryption.encrypt(license, self.secret, init_iv),
+            "username": encryption.encrypt(user, self.enckey, init_iv),
+            "key": encryption.encrypt(license, self.enckey, init_iv),
+			"sessionid": binascii.hexlify(self.sessionid.encode()),
             "name": binascii.hexlify(self.name.encode()),
             "ownerid": binascii.hexlify(self.ownerid.encode()),
             "init_iv": init_iv
@@ -111,7 +108,7 @@ class api:
 
         response = self.__do_request(post_data)
 
-        response = encryption.decrypt(response, self.secret, init_iv)
+        response = encryption.decrypt(response, self.enckey, init_iv)
 
         json = jsond.loads(response)
 
@@ -124,15 +121,14 @@ class api:
     def login(self, user, password, hwid=None):
         if hwid is None: hwid = others.get_hwid()
         
-        self.session_iv = str(uuid4())[:8]
-
-        init_iv = SHA256.new(self.session_iv.encode()).hexdigest()
+        init_iv = SHA256.new(str(uuid4())[:8].encode()).hexdigest()
 
         post_data = {
             "type": binascii.hexlify(("login").encode()),
-            "username": encryption.encrypt(user, self.secret, init_iv),
-            "pass": encryption.encrypt(password, self.secret, init_iv),
-            "hwid": encryption.encrypt(hwid, self.secret, init_iv),
+            "username": encryption.encrypt(user, self.enckey, init_iv),
+            "pass": encryption.encrypt(password, self.enckey, init_iv),
+            "hwid": encryption.encrypt(hwid, self.enckey, init_iv),
+			"sessionid": binascii.hexlify(self.sessionid.encode()),
             "name": binascii.hexlify(self.name.encode()),
             "ownerid": binascii.hexlify(self.ownerid.encode()),
             "init_iv": init_iv
@@ -140,7 +136,7 @@ class api:
 
         response = self.__do_request(post_data)
 
-        response = encryption.decrypt(response, self.secret, init_iv)
+        response = encryption.decrypt(response, self.enckey, init_iv)
 
         json = jsond.loads(response)
 
@@ -153,22 +149,21 @@ class api:
     def license(self, key, hwid=None):
         if hwid is None: hwid = others.get_hwid()
         
-        self.session_iv = str(uuid4())[:8]
-
-        init_iv = SHA256.new(self.session_iv.encode()).hexdigest()
+        init_iv = SHA256.new(str(uuid4())[:8].encode()).hexdigest()
 
         post_data = {
             "type": binascii.hexlify(("license").encode()),
-            "key": encryption.encrypt(key, self.secret, init_iv),
-            "hwid": encryption.encrypt(hwid, self.secret, init_iv),
+            "key": encryption.encrypt(key, self.enckey, init_iv),
+            "hwid": encryption.encrypt(hwid, self.enckey, init_iv),
+			"sessionid": binascii.hexlify(self.sessionid.encode()),
             "name": binascii.hexlify(self.name.encode()),
             "ownerid": binascii.hexlify(self.ownerid.encode()),
             "init_iv": init_iv
         }
 
         response = self.__do_request(post_data)
-
-        response = encryption.decrypt(response, self.secret, init_iv)
+        print(response)
+        response = encryption.decrypt(response, self.enckey, init_iv)
 
         json = jsond.loads(response)
 
@@ -177,23 +172,16 @@ class api:
             print("successfully logged into license")
         else:
             print(json["message"])
-            if os.path.exists(KEYSAVE_PATH):
-                os.remove(KEYSAVE_PATH)
-                time.sleep(5)
             sys.exit()
             
-    def var(self, name, hwid=None):
-        if hwid is None: hwid = others.get_hwid()
+    def var(self, name):
         
-        self.session_iv = str(uuid4())[:8]
-
-        init_iv = SHA256.new(self.session_iv.encode()).hexdigest()
+        init_iv = SHA256.new(str(uuid4())[:8].encode()).hexdigest()
 
         post_data = {
             "type": binascii.hexlify(("var").encode()),
-            "key": encryption.encrypt(self.user_data.key, self.secret, init_iv),
-            "varid": encryption.encrypt(name, self.secret, init_iv),
-            "hwid": encryption.encrypt(hwid, self.secret, init_iv),
+            "varid": encryption.encrypt(name, self.enckey, init_iv),
+            "sessionid": binascii.hexlify(self.sessionid.encode()),
             "name": binascii.hexlify(self.name.encode()),
             "ownerid": binascii.hexlify(self.ownerid.encode()),
             "init_iv": init_iv
@@ -201,22 +189,90 @@ class api:
 
         response = self.__do_request(post_data)
 
-        response = encryption.decrypt(response, self.secret, init_iv)
+        response = encryption.decrypt(response, self.enckey, init_iv)
 
         json = jsond.loads(response)
 
         if json["success"]:
-            return json["response"]
+            return json["message"]
         else:
             print(json["message"])
             time.sleep(5)
             sys.exit()
-            
+		
+    def file(self, fileid):
+        
+        init_iv = SHA256.new(str(uuid4())[:8].encode()).hexdigest()
+
+        post_data = {
+            "type": binascii.hexlify(("file").encode()),
+            "fileid": encryption.encrypt(fileid, self.enckey, init_iv),
+            "sessionid": binascii.hexlify(self.sessionid.encode()),
+            "name": binascii.hexlify(self.name.encode()),
+            "ownerid": binascii.hexlify(self.ownerid.encode()),
+            "init_iv": init_iv
+        }
+
+        response = self.__do_request(post_data)
+
+        response = encryption.decrypt(response, self.enckey, init_iv)
+
+        json = jsond.loads(response)
+
+        if not json["success"]:
+            print(json["message"])
+            time.sleep(5)
+            sys.exit()
+        return binascii.unhexlify(json["contents"])
+
+    def webhook(self, webid, param):
+        
+        init_iv = SHA256.new(str(uuid4())[:8].encode()).hexdigest()
+
+        post_data = {
+            "type": binascii.hexlify(("webhook").encode()),
+            "webid": encryption.encrypt(webid, self.enckey, init_iv),
+            "params": encryption.encrypt(param, self.enckey, init_iv),
+            "sessionid": binascii.hexlify(self.sessionid.encode()),
+            "name": binascii.hexlify(self.name.encode()),
+            "ownerid": binascii.hexlify(self.ownerid.encode()),
+            "init_iv": init_iv
+        }
+
+        response = self.__do_request(post_data)
+
+        response = encryption.decrypt(response, self.enckey, init_iv)
+        print(response)
+        json = jsond.loads(response)
+
+        if json["success"]:
+            return json["message"]
+        else:
+            print(json["message"])
+            time.sleep(5)
+            sys.exit()
+
+    def log(self, message):
+        
+        init_iv = SHA256.new(str(uuid4())[:8].encode()).hexdigest()
+
+        post_data = {
+            "type": binascii.hexlify(("log").encode()),
+            "pcuser": encryption.encrypt(os.getenv('username'), self.enckey, init_iv),
+            "message": encryption.encrypt(message, self.enckey, init_iv),
+            "sessionid": binascii.hexlify(self.sessionid.encode()),
+            "name": binascii.hexlify(self.name.encode()),
+            "ownerid": binascii.hexlify(self.ownerid.encode()),
+            "init_iv": init_iv
+        }
+
+        self.__do_request(post_data)
+
     def __do_request(self, post_data):
         headers = {"User-Agent": "KeyAuth"}
 
         rq_out = requests.post(
-            "https://keyauth.com/api/v7/", data=post_data, headers=headers, verify="keyauth.pem"
+            "https://keyauth.com/api/1.0/", data=post_data, headers=headers, verify="keyauth.pem"
         )
 
         return rq_out.text
@@ -230,11 +286,7 @@ class api:
     user_data = user_data_class()
 
     def __load_user_data(self, data):
-        self.user_data.key = data["key"]
-
-        self.user_data.expiry = datetime.datetime.fromtimestamp(int(data["expiry"]))
-
-        self.user_data.level = data["level"]
+        self.user_data.username = data["username"]
 
 
 class others:
