@@ -4,11 +4,6 @@ import os
 import os.path
 import platform
 
-if platform.system() == "Windows":
-    KEYSAVE_PATH = "C:\\ProgramData\\keysave.txt"
-else:
-    KEYSAVE_PATH = "/usr/keysave.txt"
-
 keyauthapp = api("your application name", "your owner id", "your application secret","1.0")
 
 print("Initializing")
