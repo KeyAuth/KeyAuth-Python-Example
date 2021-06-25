@@ -272,7 +272,7 @@ class api:
         headers = {"User-Agent": "KeyAuth"}
 
         rq_out = requests.post(
-            "https://keyauth.com/api/1.0/", data=post_data, headers=headers, verify="keyauth.pem"
+            "https://keyauth.com/api/1.0/", data=post_data, headers=headers
         )
 
         return rq_out.text
