@@ -1,6 +1,6 @@
 import json as jsond  # json
 
-import time # sleep before exit
+import time  # sleep before exit
 
 import binascii  # hex encoding
 
@@ -13,7 +13,13 @@ from Crypto.Hash import SHA256
 from Crypto.Util.Padding import pad, unpad
 # aes + padding, sha256
 
-import webbrowser, platform, subprocess, datetime, datetime, sys, os
+import webbrowser
+import platform
+import subprocess
+import datetime
+import datetime
+import sys
+import os
 
 from requests_toolbelt.adapters.fingerprint import FingerprintAdapter
 
@@ -27,7 +33,7 @@ class api:
         self.ownerid = ownerid
 
         self.secret = secret
-        
+
         self.version = version
 
     sessionid = enckey = ""
@@ -62,10 +68,11 @@ class api:
             sys.exit()
 
         self.sessionid = json["sessionid"]
-            
+
     def register(self, user, password, license, hwid=None):
-        if hwid is None: hwid = others.get_hwid()
-        
+        if hwid is None:
+            hwid = others.get_hwid()
+
         init_iv = SHA256.new(str(uuid4())[:8].encode()).hexdigest()
 
         post_data = {
@@ -91,16 +98,16 @@ class api:
         else:
             print(json["message"])
             sys.exit()
-            
+
     def upgrade(self, user, license):
-        
+
         init_iv = SHA256.new(str(uuid4())[:8].encode()).hexdigest()
 
         post_data = {
             "type": binascii.hexlify(("upgrade").encode()),
             "username": encryption.encrypt(user, self.enckey, init_iv),
             "key": encryption.encrypt(license, self.enckey, init_iv),
-			"sessionid": binascii.hexlify(self.sessionid.encode()),
+            "sessionid": binascii.hexlify(self.sessionid.encode()),
             "name": binascii.hexlify(self.name.encode()),
             "ownerid": binascii.hexlify(self.ownerid.encode()),
             "init_iv": init_iv
@@ -117,10 +124,11 @@ class api:
         else:
             print(json["message"])
             sys.exit()
-            
+
     def login(self, user, password, hwid=None):
-        if hwid is None: hwid = others.get_hwid()
-        
+        if hwid is None:
+            hwid = others.get_hwid()
+
         init_iv = SHA256.new(str(uuid4())[:8].encode()).hexdigest()
 
         post_data = {
@@ -128,7 +136,7 @@ class api:
             "username": encryption.encrypt(user, self.enckey, init_iv),
             "pass": encryption.encrypt(password, self.enckey, init_iv),
             "hwid": encryption.encrypt(hwid, self.enckey, init_iv),
-			"sessionid": binascii.hexlify(self.sessionid.encode()),
+            "sessionid": binascii.hexlify(self.sessionid.encode()),
             "name": binascii.hexlify(self.name.encode()),
             "ownerid": binascii.hexlify(self.ownerid.encode()),
             "init_iv": init_iv
@@ -147,15 +155,16 @@ class api:
             sys.exit()
 
     def license(self, key, hwid=None):
-        if hwid is None: hwid = others.get_hwid()
-        
+        if hwid is None:
+            hwid = others.get_hwid()
+
         init_iv = SHA256.new(str(uuid4())[:8].encode()).hexdigest()
 
         post_data = {
             "type": binascii.hexlify(("license").encode()),
             "key": encryption.encrypt(key, self.enckey, init_iv),
             "hwid": encryption.encrypt(hwid, self.enckey, init_iv),
-			"sessionid": binascii.hexlify(self.sessionid.encode()),
+            "sessionid": binascii.hexlify(self.sessionid.encode()),
             "name": binascii.hexlify(self.name.encode()),
             "ownerid": binascii.hexlify(self.ownerid.encode()),
             "init_iv": init_iv
@@ -173,9 +182,9 @@ class api:
         else:
             print(json["message"])
             sys.exit()
-            
+
     def var(self, name):
-        
+
         init_iv = SHA256.new(str(uuid4())[:8].encode()).hexdigest()
 
         post_data = {
@@ -199,9 +208,9 @@ class api:
             print(json["message"])
             time.sleep(5)
             sys.exit()
-		
+
     def file(self, fileid):
-        
+
         init_iv = SHA256.new(str(uuid4())[:8].encode()).hexdigest()
 
         post_data = {
@@ -226,7 +235,7 @@ class api:
         return binascii.unhexlify(json["contents"])
 
     def webhook(self, webid, param):
-        
+
         init_iv = SHA256.new(str(uuid4())[:8].encode()).hexdigest()
 
         post_data = {
@@ -253,7 +262,7 @@ class api:
             sys.exit()
 
     def log(self, message):
-        
+
         init_iv = SHA256.new(str(uuid4())[:8].encode()).hexdigest()
 
         post_data = {
@@ -272,7 +281,7 @@ class api:
         headers = {"User-Agent": "KeyAuth"}
 
         rq_out = requests.post(
-            "https://keyauth.com/api/1.0/", data=post_data, headers=headers
+            "https://keyauth.com/api/1.0/", data=post_data, headers=headers, verify="keyauth.crt"
         )
 
         return rq_out.text
@@ -295,7 +304,8 @@ class others:
         if platform.system() != "Windows":
             return "None"
 
-        cmd = subprocess.Popen("wmic useraccount where name='%username%' get sid", stdout=subprocess.PIPE, shell=True)
+        cmd = subprocess.Popen(
+            "wmic useraccount where name='%username%' get sid", stdout=subprocess.PIPE, shell=True)
 
         (suppost_sid, error) = cmd.communicate()
 
