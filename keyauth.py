@@ -60,7 +60,6 @@ class api:
             sys.exit()
 
         response = encryption.decrypt(response, self.secret, init_iv)
-        print(response)
         json = jsond.loads(response)
 
         if not json["success"]:
@@ -171,7 +170,6 @@ class api:
         }
 
         response = self.__do_request(post_data)
-        print(response)
         response = encryption.decrypt(response, self.enckey, init_iv)
 
         json = jsond.loads(response)
@@ -251,7 +249,6 @@ class api:
         response = self.__do_request(post_data)
 
         response = encryption.decrypt(response, self.enckey, init_iv)
-        print(response)
         json = jsond.loads(response)
 
         if json["success"]:
