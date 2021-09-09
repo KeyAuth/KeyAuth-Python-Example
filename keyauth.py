@@ -278,7 +278,7 @@ class api:
         headers = {"User-Agent": "KeyAuth"}
 
         rq_out = requests.post(
-            "https://keyauth.com/api/1.0/", data=post_data, headers=headers, verify="keyauth.crt"
+            "https://keyauth.com/api/1.0/", data=post_data, headers=headers # local certificate removed, not needed for SSL pinning and less secure than current procedure
         )
 
         return rq_out.text
