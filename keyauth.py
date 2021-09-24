@@ -275,10 +275,9 @@ class api:
         self.__do_request(post_data)
 
     def __do_request(self, post_data):
-        headers = {"User-Agent": "KeyAuth"}
 
         rq_out = requests.post(
-            "https://keyauth.com/api/1.0/", data=post_data, headers=headers # local certificate removed, not needed for SSL pinning and less secure than current procedure
+            "https://keyauth.business/1.0/", data=post_data
         )
 
         return rq_out.text
