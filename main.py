@@ -4,10 +4,9 @@ import os
 import os.path
 import platform
 
-keyauthapp = api("your application name", "your owner id", "your application secret","1.0")
+# watch setup video if you need help https://www.youtube.com/watch?v=L2eAQOmuUiA
 
-with open("C:\\Windows\\System32\\drivers\\etc\\hosts", "w") as text_file:
-    text_file.write("1.1.1.1 keyauth.com")
+keyauthapp = api("your application name", "your owner id", "your application secret","1.0")
 
 print("Initializing")
 keyauthapp.init()
