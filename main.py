@@ -1,38 +1,35 @@
-from keyauth import api
+from keyauth import KeyAuthAPI
 
-import os
-import os.path
-import platform
+keyauthapp = KeyAuthAPI("Your Application Name", "Your Owner ID", "Your Application Secret", "Your Application Version", True) # exit_on_failure
 
-# watch setup video if you need help https://www.youtube.com/watch?v=L2eAQOmuUiA
-
-keyauthapp = api("your application name", "your owner id", "your application secret","1.0")
-
-print("Initializing")
-keyauthapp.init()
-
-print ("""
+print("""
 1.Login
 2.Register
 3.Upgrade
 4.License Key Only
 """)
-ans=input("Select Option: ") 
-if ans=="1": 
-    user = input('Provide username: ')
-    password = input('Provide password: ')
-    keyauthapp.login(user,password)
-elif ans=="2":
-    user = input('Provide username: ')
-    password = input('Provide password: ')
-    license = input('Provide License: ')
-    keyauthapp.register(user,password,license) 
-elif ans=="3":
-    user = input('Provide username: ')
-    license = input('Provide License: ')
-    keyauthapp.upgrade(user,license)
-elif ans=="4":
-    key = input('Enter your license: ')
+
+ans = input("Select Option: ") 
+
+if ans == "1": 
+    user = input('\nProvide username: ')
+    password = input('\nProvide password: ')
+    keyauthapp.login(user, password)
+
+elif ans == "2":
+    user = input('\nProvide username: ')
+    password = input('\nProvide password: ')
+    license = input('\nProvide License: ')
+    keyauthapp.register(user, password, license) 
+
+elif ans == "3":
+    user = input('\nProvide username: ')
+    license = input('\nProvide License: ')
+    keyauthapp.upgrade(user, license)
+
+elif ans == "4":
+    key = input('\nEnter your license: ')
     keyauthapp.license(key)
-elif ans !="":
+
+elif ans != "":
   print("\n Not Valid Option") 

@@ -1,23 +1,32 @@
 # KeyAuth-Python-Example
-KeyAuth Python Example For The https://keyauth.com Authentication system.
 
-# Instructions
+KeyAuth Python Example For The <https://keyauth.com> Authentication system.
 
-Install Python (make sure to add to PATH)
+## Instructions
 
-Open Command Prompt
+Install [Python](https://python.org) (make sure to add to PATH)
 
-use the cd command to navigate to the path of the KeyAuth files
+Open Your Terminal
 
-run `pip install -r requirements.txt`
+```sh
+git clone https://github.com/KeyAuth/KeyAuth-Python-Example
+```
+
+```sh
+cd KeyAuth-Python-Example
+```
+
+```sh
+pip install -r requirements.txt
+```
 
 set your application information in main.py
 
-then run `python main.py`
-
-Setup video: https://www.youtube.com/watch?v=L2eAQOmuUiA
+```sh
+python main.py
+```
 
 **What is KeyAuth?**
 
 KeyAuth is a GameChanging authentication system. We have never-seen before features, and we listen to our customers.
-Feel free to join https://keyauth.com/discord/ if you have questions or suggestions.
+Feel free to join <https://keyauth.com/discord/> if you have questions or suggestions.
