@@ -3,10 +3,11 @@ from keyauth import api
 import os
 import os.path
 import platform
+from datetime import datetime
 
 # watch setup video if you need help https://www.youtube.com/watch?v=L2eAQOmuUiA
 
-keyauthapp = api("your application name", "your owner id", "your application secret","1.0")
+keyauthapp = api("app name here", "owner id here", "app secret here","1.0")
 
 print("Initializing")
 keyauthapp.init()
@@ -36,3 +37,11 @@ elif ans=="4":
     keyauthapp.license(key)
 elif ans !="":
   print("\n Not Valid Option") 
+
+print("\n User data: ") 
+print(" Username: " + keyauthapp.user_data.username)
+print(" IP address: " + keyauthapp.user_data.ip)
+print(" Hardware-Id: " + keyauthapp.user_data.hwid)
+print(" Created at: " + datetime.utcfromtimestamp(int(keyauthapp.user_data.createdate)).strftime('%Y-%m-%d %H:%M:%S'))
+print(" Last login at: " + datetime.utcfromtimestamp(int(keyauthapp.user_data.lastlogin)).strftime('%Y-%m-%d %H:%M:%S'))
+print(" Expires at: " + datetime.utcfromtimestamp(int(keyauthapp.user_data.expires)).strftime('%Y-%m-%d %H:%M:%S'))

@@ -17,7 +17,6 @@ import webbrowser
 import platform
 import subprocess
 import datetime
-import datetime
 import sys
 import os
 
@@ -148,6 +147,7 @@ class api:
         json = jsond.loads(response)
 
         if json["success"]:
+            self.__load_user_data(json["info"])
             print("successfully logged in")
         else:
             print(json["message"])
@@ -277,21 +277,24 @@ class api:
     def __do_request(self, post_data):
 
         rq_out = requests.post(
-            "https://keyauth.business/1.0/", data=post_data
+            "https://keyauth.win/api/1.0/", data=post_data
         )
 
         return rq_out.text
 
     # region user_data
     class user_data_class:
-        key = ""
-        expiry = datetime.datetime.now()
-        level = 0
+        username = ip = hwid = expires = createdate = lastlogin = ""
 
     user_data = user_data_class()
 
     def __load_user_data(self, data):
         self.user_data.username = data["username"]
+        self.user_data.ip = data["ip"]
+        self.user_data.hwid = data["hwid"]
+        self.user_data.expires = data["subscriptions"][0]["expiry"]
+        self.user_data.createdate = data["createdate"]
+        self.user_data.lastlogin = data["lastlogin"]
 
 
 class others:
