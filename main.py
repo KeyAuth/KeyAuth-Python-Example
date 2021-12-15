@@ -1,6 +1,7 @@
 from keyauth import api
 
 import os
+import sys
 import os.path
 import platform
 from datetime import datetime
