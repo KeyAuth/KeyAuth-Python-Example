@@ -301,7 +301,7 @@ class others:
     @staticmethod
     def get_hwid():
         if platform.system() != "Windows":
-            return "None"
+            return subprocess.Popen('hal-get-property --udi /org/freedesktop/Hal/devices/computer --key system.hardware.uuid'.split())
 
         cmd = subprocess.Popen(
             "wmic useraccount where name='%username%' get sid", stdout=subprocess.PIPE, shell=True)
