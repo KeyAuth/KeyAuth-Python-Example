@@ -1,5 +1,5 @@
 # KeyAuth-Python-Example
-KeyAuth Python Example For The https://keyauth.com Authentication system.
+KeyAuth Python Example For The https://keyauth.win Authentication system.
 
 # Instructions
 
@@ -20,4 +20,4 @@ Setup video: https://www.youtube.com/watch?v=L2eAQOmuUiA
 **What is KeyAuth?**
 
 KeyAuth is a GameChanging authentication system. We have never-seen before features, and we listen to our customers.
-Feel free to join https://keyauth.com/discord/ if you have questions or suggestions.
+Feel free to join https://keyauth.win/discord/ if you have questions or suggestions.
