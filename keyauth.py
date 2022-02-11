@@ -284,7 +284,7 @@ class api:
 
     # region user_data
     class user_data_class:
-        username = ip = hwid = expires = createdate = lastlogin = ""
+        username = ip = hwid = expires = createdate = lastlogin = subscription = ""
 
     user_data = user_data_class()
 
@@ -295,6 +295,7 @@ class api:
         self.user_data.expires = data["subscriptions"][0]["expiry"]
         self.user_data.createdate = data["createdate"]
         self.user_data.lastlogin = data["lastlogin"]
+        self.user_data.subcription = data["subscriptions"][0]["subscription"]
 
 
 class others:
