@@ -19,6 +19,7 @@ print ("""
 3.Upgrade
 4.License Key Only
 """)
+print(f"Current Session Validation Status: {keyauthapp.check()}")
 ans=input("Select Option: ") 
 if ans=="1": 
 	user = input('Provide username: ')
@@ -47,3 +48,4 @@ print("Hardware-Id: " + keyauthapp.user_data.hwid)
 print("Created at: " + datetime.utcfromtimestamp(int(keyauthapp.user_data.createdate)).strftime('%Y-%m-%d %H:%M:%S'))
 print("Last login at: " + datetime.utcfromtimestamp(int(keyauthapp.user_data.lastlogin)).strftime('%Y-%m-%d %H:%M:%S'))
 print("Expires at: " + datetime.utcfromtimestamp(int(keyauthapp.user_data.expires)).strftime('%Y-%m-%d %H:%M:%S'))
+print(f"Current Session Validation Status: {keyauthapp.check()}")
