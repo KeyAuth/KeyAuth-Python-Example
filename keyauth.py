@@ -231,6 +231,24 @@ class api:
             time.sleep(5)
             sys.exit()
         return binascii.unhexlify(json["contents"])
+    
+    def check(self):
+        init_iv = SHA256.new(str(uuid4())[:8].encode()).hexdigest()
+        post_data = {
+            "type": binascii.hexlify(("check").encode()),
+            "sessionid": binascii.hexlify(self.sessionid.encode()),
+            "name": binascii.hexlify(self.name.encode()),
+            "ownerid": binascii.hexlify(self.ownerid.encode()),
+            "init_iv": init_iv
+        }
+        response = self.__do_request(post_data)
+
+        response = encryption.decrypt(response, self.enckey, init_iv)
+        json = jsond.loads(response)
+        if json["success"]:
+            return True
+        else:
+            return False
 
     def webhook(self, webid, param):
 
