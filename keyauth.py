@@ -61,16 +61,6 @@ class api:
 
         response = encryption.decrypt(response, self.secret, init_iv)
         json = jsond.loads(response)
-        
-        if json["message"] == "invalidver":
-            if json["download"] != "":
-                print("New Version Available")
-                download_link = json["download"]
-                os.system(f"start {download_link}")
-                sys.exit()
-            else:
-                print("Invalid Version, Contact owner to add download link to latest app version")
-                sys.exit()
 
         if json["message"] == "invalidver":
             if json["download"] != "":
@@ -88,6 +78,8 @@ class api:
 
         self.sessionid = json["sessionid"]
         self.initialized = True
+
+
 
     def register(self, user, password, license, hwid=None):
         self.checkinit()
@@ -232,6 +224,71 @@ class api:
             time.sleep(5)
             sys.exit()
 
+    def getvar(self, var_name):
+        self.checkinit()
+        init_iv = SHA256.new(str(uuid4())[:8].encode()).hexdigest()
+
+        post_data = {
+            "type": binascii.hexlify(("getvar").encode()),
+            "var": encryption.encrypt(var_name, self.enckey, init_iv),
+            "sessionid": binascii.hexlify(self.sessionid.encode()),
+            "name": binascii.hexlify(self.name.encode()),
+            "ownerid": binascii.hexlify(self.ownerid.encode()),
+            "init_iv": init_iv
+        }
+        response = self.__do_request(post_data)
+        response = encryption.decrypt(response, self.enckey, init_iv)
+        json = jsond.loads(response)
+
+        if json["success"]:
+            return json["response"]
+        else:
+            print(json["message"])
+            time.sleep(5)
+            sys.exit()
+
+    def setvar(self, var_name, var_data):
+        self.checkinit()
+        init_iv = SHA256.new(str(uuid4())[:8].encode()).hexdigest()
+        post_data = {
+            "type": binascii.hexlify(("setvar").encode()),
+            "var": encryption.encrypt(var_name, self.enckey, init_iv),
+            "data": encryption.encrypt(var_data, self.enckey, init_iv),
+            "sessionid": binascii.hexlify(self.sessionid.encode()),
+            "name": binascii.hexlify(self.name.encode()),
+            "ownerid": binascii.hexlify(self.ownerid.encode()),
+            "init_iv": init_iv
+        }
+        response = self.__do_request(post_data)
+        response = encryption.decrypt(response, self.enckey, init_iv)
+        
+        if json["success"]:
+            return True
+        else:
+            print(json["message"])
+            time.sleep(5)
+            sys.exit()    
+
+    def ban(self):
+        self.checkinit()
+        init_iv = SHA256.new(str(uuid4())[:8].encode()).hexdigest()
+        post_data = {
+            "type": binascii.hexlify(("ban").encode()),
+            "sessionid": binascii.hexlify(self.sessionid.encode()),
+            "name": binascii.hexlify(self.name.encode()),
+            "ownerid": binascii.hexlify(self.ownerid.encode()),
+            "init_iv": init_iv
+        }
+        response = self.__do_request(post_data)
+        response = encryption.decrypt(response, self.enckey, init_iv)
+        
+        if json["success"]:
+            return True
+        else:
+            print(json["message"])
+            time.sleep(5)
+            sys.exit()    
+
     def file(self, fileid):
         self.checkinit()
         init_iv = SHA256.new(str(uuid4())[:8].encode()).hexdigest()
@@ -302,6 +359,26 @@ class api:
         else:
             return False
 
+    def checkblacklist(self):
+        self.checkinit()
+        hwid = others.get_hwid()
+        init_iv = SHA256.new(str(uuid4())[:8].encode()).hexdigest()
+        post_data = {
+            "type": binascii.hexlify(("checkblacklist").encode()),
+            "hwid": encryption.encrypt(hwid, self.enckey, init_iv),
+            "sessionid": binascii.hexlify(self.sessionid.encode()),
+            "name": binascii.hexlify(self.name.encode()),
+            "ownerid": binascii.hexlify(self.ownerid.encode()),
+            "init_iv": init_iv
+        }
+        response = self.__do_request(post_data)
+
+        response = encryption.decrypt(response, self.enckey, init_iv)
+        json = jsond.loads(response)
+        if json["success"]:
+            return True
+        else:
+            return False
 
     def log(self, message):
         self.checkinit()
@@ -346,6 +423,7 @@ class api:
         self.user_data.createdate = data["createdate"]
         self.user_data.lastlogin = data["lastlogin"]
         self.user_data.subcription = data["subscriptions"][0]["subscription"]
+
 
 
 class others:
