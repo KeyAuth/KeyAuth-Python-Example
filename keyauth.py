@@ -261,6 +261,7 @@ class api:
         }
         response = self.__do_request(post_data)
         response = encryption.decrypt(response, self.enckey, init_iv)
+        json = jsond.loads(response)
         
         if json["success"]:
             return True
@@ -281,6 +282,7 @@ class api:
         }
         response = self.__do_request(post_data)
         response = encryption.decrypt(response, self.enckey, init_iv)
+        json = jsond.loads(response)
         
         if json["success"]:
             return True
