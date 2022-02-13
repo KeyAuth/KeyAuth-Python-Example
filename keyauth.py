@@ -36,6 +36,7 @@ class api:
         self.version = version
 
     sessionid = enckey = ""
+    initialized = False
 
     def init(self):
 
@@ -61,13 +62,25 @@ class api:
         response = encryption.decrypt(response, self.secret, init_iv)
         json = jsond.loads(response)
 
+        if json["message"] == "invalidver":
+            if json["download"] != "":
+                print("New Version Available")
+                download_link = json["download"]
+                os.system(f"start {download_link}")
+                sys.exit()
+            else:
+                print("Invalid Version, Contact owner to add download link to latest app version")
+                sys.exit()
+
         if not json["success"]:
             print(json["message"])
             sys.exit()
 
         self.sessionid = json["sessionid"]
+        self.initialized = True
 
     def register(self, user, password, license, hwid=None):
+        self.checkinit()
         if hwid is None:
             hwid = others.get_hwid()
 
@@ -98,7 +111,7 @@ class api:
             sys.exit()
 
     def upgrade(self, user, license):
-
+        self.checkinit()
         init_iv = SHA256.new(str(uuid4())[:8].encode()).hexdigest()
 
         post_data = {
@@ -124,6 +137,7 @@ class api:
             sys.exit()
 
     def login(self, user, password, hwid=None):
+        self.checkinit()
         if hwid is None:
             hwid = others.get_hwid()
 
@@ -154,6 +168,7 @@ class api:
             sys.exit()
 
     def license(self, key, hwid=None):
+        self.checkinit()
         if hwid is None:
             hwid = others.get_hwid()
 
@@ -182,7 +197,7 @@ class api:
             sys.exit()
 
     def var(self, name):
-
+        self.checkinit()
         init_iv = SHA256.new(str(uuid4())[:8].encode()).hexdigest()
 
         post_data = {
@@ -208,7 +223,7 @@ class api:
             sys.exit()
 
     def file(self, fileid):
-
+        self.checkinit()
         init_iv = SHA256.new(str(uuid4())[:8].encode()).hexdigest()
 
         post_data = {
@@ -231,27 +246,9 @@ class api:
             time.sleep(5)
             sys.exit()
         return binascii.unhexlify(json["contents"])
-    
-    def check(self):
-        init_iv = SHA256.new(str(uuid4())[:8].encode()).hexdigest()
-        post_data = {
-            "type": binascii.hexlify(("check").encode()),
-            "sessionid": binascii.hexlify(self.sessionid.encode()),
-            "name": binascii.hexlify(self.name.encode()),
-            "ownerid": binascii.hexlify(self.ownerid.encode()),
-            "init_iv": init_iv
-        }
-        response = self.__do_request(post_data)
-
-        response = encryption.decrypt(response, self.enckey, init_iv)
-        json = jsond.loads(response)
-        if json["success"]:
-            return True
-        else:
-            return False
 
     def webhook(self, webid, param):
-
+        self.checkinit()
         init_iv = SHA256.new(str(uuid4())[:8].encode()).hexdigest()
 
         post_data = {
@@ -276,8 +273,28 @@ class api:
             time.sleep(5)
             sys.exit()
 
-    def log(self, message):
+    def check(self):
+        self.checkinit()
+        init_iv = SHA256.new(str(uuid4())[:8].encode()).hexdigest()
+        post_data = {
+            "type": binascii.hexlify(("check").encode()),
+            "sessionid": binascii.hexlify(self.sessionid.encode()),
+            "name": binascii.hexlify(self.name.encode()),
+            "ownerid": binascii.hexlify(self.ownerid.encode()),
+            "init_iv": init_iv
+        }
+        response = self.__do_request(post_data)
 
+        response = encryption.decrypt(response, self.enckey, init_iv)
+        json = jsond.loads(response)
+        if json["success"]:
+            return True
+        else:
+            return False
+
+
+    def log(self, message):
+        self.checkinit()
         init_iv = SHA256.new(str(uuid4())[:8].encode()).hexdigest()
 
         post_data = {
@@ -292,6 +309,11 @@ class api:
 
         self.__do_request(post_data)
 
+    def checkinit(self):
+        if not self.initialized:
+            print("Initialize first, in order to use the functions")
+            sys.exit()
+        
     def __do_request(self, post_data):
 
         rq_out = requests.post(
