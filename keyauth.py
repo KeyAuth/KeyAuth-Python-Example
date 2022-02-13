@@ -61,6 +61,16 @@ class api:
 
         response = encryption.decrypt(response, self.secret, init_iv)
         json = jsond.loads(response)
+        
+        if json["message"] == "invalidver":
+            if json["download"] != "":
+                print("New Version Available")
+                download_link = json["download"]
+                os.system(f"start {download_link}")
+                sys.exit()
+            else:
+                print("Invalid Version, Contact owner to add download link to latest app version")
+                sys.exit()
 
         if json["message"] == "invalidver":
             if json["download"] != "":
