@@ -36,6 +36,7 @@ class api:
         self.version = version
 
     sessionid = enckey = ""
+    initialized = False
 
     def init(self):
 
@@ -60,7 +61,7 @@ class api:
 
         response = encryption.decrypt(response, self.secret, init_iv)
         json = jsond.loads(response)
-        
+
         if json["message"] == "invalidver":
             if json["download"] != "":
                 print("New Version Available")
@@ -76,8 +77,12 @@ class api:
             sys.exit()
 
         self.sessionid = json["sessionid"]
+        self.initialized = True
+
+
 
     def register(self, user, password, license, hwid=None):
+        self.checkinit()
         if hwid is None:
             hwid = others.get_hwid()
 
@@ -108,7 +113,7 @@ class api:
             sys.exit()
 
     def upgrade(self, user, license):
-
+        self.checkinit()
         init_iv = SHA256.new(str(uuid4())[:8].encode()).hexdigest()
 
         post_data = {
@@ -134,6 +139,7 @@ class api:
             sys.exit()
 
     def login(self, user, password, hwid=None):
+        self.checkinit()
         if hwid is None:
             hwid = others.get_hwid()
 
@@ -164,6 +170,7 @@ class api:
             sys.exit()
 
     def license(self, key, hwid=None):
+        self.checkinit()
         if hwid is None:
             hwid = others.get_hwid()
 
@@ -192,7 +199,7 @@ class api:
             sys.exit()
 
     def var(self, name):
-
+        self.checkinit()
         init_iv = SHA256.new(str(uuid4())[:8].encode()).hexdigest()
 
         post_data = {
@@ -217,8 +224,75 @@ class api:
             time.sleep(5)
             sys.exit()
 
-    def file(self, fileid):
+    def getvar(self, var_name):
+        self.checkinit()
+        init_iv = SHA256.new(str(uuid4())[:8].encode()).hexdigest()
 
+        post_data = {
+            "type": binascii.hexlify(("getvar").encode()),
+            "var": encryption.encrypt(var_name, self.enckey, init_iv),
+            "sessionid": binascii.hexlify(self.sessionid.encode()),
+            "name": binascii.hexlify(self.name.encode()),
+            "ownerid": binascii.hexlify(self.ownerid.encode()),
+            "init_iv": init_iv
+        }
+        response = self.__do_request(post_data)
+        response = encryption.decrypt(response, self.enckey, init_iv)
+        json = jsond.loads(response)
+
+        if json["success"]:
+            return json["response"]
+        else:
+            print(json["message"])
+            time.sleep(5)
+            sys.exit()
+
+    def setvar(self, var_name, var_data):
+        self.checkinit()
+        init_iv = SHA256.new(str(uuid4())[:8].encode()).hexdigest()
+        post_data = {
+            "type": binascii.hexlify(("setvar").encode()),
+            "var": encryption.encrypt(var_name, self.enckey, init_iv),
+            "data": encryption.encrypt(var_data, self.enckey, init_iv),
+            "sessionid": binascii.hexlify(self.sessionid.encode()),
+            "name": binascii.hexlify(self.name.encode()),
+            "ownerid": binascii.hexlify(self.ownerid.encode()),
+            "init_iv": init_iv
+        }
+        response = self.__do_request(post_data)
+        response = encryption.decrypt(response, self.enckey, init_iv)
+        json = jsond.loads(response)
+        
+        if json["success"]:
+            return True
+        else:
+            print(json["message"])
+            time.sleep(5)
+            sys.exit()    
+
+    def ban(self):
+        self.checkinit()
+        init_iv = SHA256.new(str(uuid4())[:8].encode()).hexdigest()
+        post_data = {
+            "type": binascii.hexlify(("ban").encode()),
+            "sessionid": binascii.hexlify(self.sessionid.encode()),
+            "name": binascii.hexlify(self.name.encode()),
+            "ownerid": binascii.hexlify(self.ownerid.encode()),
+            "init_iv": init_iv
+        }
+        response = self.__do_request(post_data)
+        response = encryption.decrypt(response, self.enckey, init_iv)
+        json = jsond.loads(response)
+        
+        if json["success"]:
+            return True
+        else:
+            print(json["message"])
+            time.sleep(5)
+            sys.exit()    
+
+    def file(self, fileid):
+        self.checkinit()
         init_iv = SHA256.new(str(uuid4())[:8].encode()).hexdigest()
 
         post_data = {
@@ -241,27 +315,9 @@ class api:
             time.sleep(5)
             sys.exit()
         return binascii.unhexlify(json["contents"])
-    
-    def check(self):
-        init_iv = SHA256.new(str(uuid4())[:8].encode()).hexdigest()
-        post_data = {
-            "type": binascii.hexlify(("check").encode()),
-            "sessionid": binascii.hexlify(self.sessionid.encode()),
-            "name": binascii.hexlify(self.name.encode()),
-            "ownerid": binascii.hexlify(self.ownerid.encode()),
-            "init_iv": init_iv
-        }
-        response = self.__do_request(post_data)
-
-        response = encryption.decrypt(response, self.enckey, init_iv)
-        json = jsond.loads(response)
-        if json["success"]:
-            return True
-        else:
-            return False
 
     def webhook(self, webid, param):
-
+        self.checkinit()
         init_iv = SHA256.new(str(uuid4())[:8].encode()).hexdigest()
 
         post_data = {
@@ -286,8 +342,48 @@ class api:
             time.sleep(5)
             sys.exit()
 
-    def log(self, message):
+    def check(self):
+        self.checkinit()
+        init_iv = SHA256.new(str(uuid4())[:8].encode()).hexdigest()
+        post_data = {
+            "type": binascii.hexlify(("check").encode()),
+            "sessionid": binascii.hexlify(self.sessionid.encode()),
+            "name": binascii.hexlify(self.name.encode()),
+            "ownerid": binascii.hexlify(self.ownerid.encode()),
+            "init_iv": init_iv
+        }
+        response = self.__do_request(post_data)
 
+        response = encryption.decrypt(response, self.enckey, init_iv)
+        json = jsond.loads(response)
+        if json["success"]:
+            return True
+        else:
+            return False
+
+    def checkblacklist(self):
+        self.checkinit()
+        hwid = others.get_hwid()
+        init_iv = SHA256.new(str(uuid4())[:8].encode()).hexdigest()
+        post_data = {
+            "type": binascii.hexlify(("checkblacklist").encode()),
+            "hwid": encryption.encrypt(hwid, self.enckey, init_iv),
+            "sessionid": binascii.hexlify(self.sessionid.encode()),
+            "name": binascii.hexlify(self.name.encode()),
+            "ownerid": binascii.hexlify(self.ownerid.encode()),
+            "init_iv": init_iv
+        }
+        response = self.__do_request(post_data)
+
+        response = encryption.decrypt(response, self.enckey, init_iv)
+        json = jsond.loads(response)
+        if json["success"]:
+            return True
+        else:
+            return False
+
+    def log(self, message):
+        self.checkinit()
         init_iv = SHA256.new(str(uuid4())[:8].encode()).hexdigest()
 
         post_data = {
@@ -302,6 +398,11 @@ class api:
 
         self.__do_request(post_data)
 
+    def checkinit(self):
+        if not self.initialized:
+            print("Initialize first, in order to use the functions")
+            sys.exit()
+        
     def __do_request(self, post_data):
 
         rq_out = requests.post(
@@ -324,6 +425,7 @@ class api:
         self.user_data.createdate = data["createdate"]
         self.user_data.lastlogin = data["lastlogin"]
         self.user_data.subcription = data["subscriptions"][0]["subscription"]
+
 
 
 class others:
