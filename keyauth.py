@@ -4,21 +4,31 @@ import time  # sleep before exit
 
 import binascii  # hex encoding
 
-import requests  # https requests
+  # https requests
 
 from uuid import uuid4  # gen random guid
-
-from Crypto.Cipher import AES
-from Crypto.Hash import SHA256
-from Crypto.Util.Padding import pad, unpad
-# aes + padding, sha256
-
 import webbrowser
 import platform
 import subprocess
 import datetime
 import sys
 import os
+
+try:
+    from Crypto.Cipher import AES
+    from Crypto.Hash import SHA256
+    from Crypto.Util.Padding import pad, unpad
+    from requests_toolbelt.adapters.fingerprint import FingerprintAdapter
+    import requests
+except Exception as f:
+    print("Exception when importing modules: " + str(f))
+    print("installing necessary modules....")
+    os.system("pip install pycryptodome")
+    os.system("pip install requests_toolbelt")
+    os.system("pip install requests")
+    print("Modules installed!")
+    time.sleep(1.5)
+    exit(0)
 
 from requests_toolbelt.adapters.fingerprint import FingerprintAdapter
 
