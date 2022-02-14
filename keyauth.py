@@ -20,8 +20,8 @@ try:
     from Crypto.Util.Padding import pad, unpad
     from requests_toolbelt.adapters.fingerprint import FingerprintAdapter
     import requests
-except Exception as f:
-    print("Exception when importing modules: " + str(f))
+except ModuleNotFoundError:
+    print("Exception when importing modules")
     print("installing necessary modules....")
     os.system("pip install pycryptodome")
     os.system("pip install requests_toolbelt")
