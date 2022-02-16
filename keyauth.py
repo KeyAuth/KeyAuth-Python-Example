@@ -46,7 +46,7 @@ class api:
     initialized = False
 
     def init(self):
-        if sessionid != "":
+        if self.sessionid != "":
             print("You've already initialized!")
             time.sleep(2)
             exit(0)
