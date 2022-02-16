@@ -3,6 +3,7 @@ import json as jsond  # json
 import time  # sleep before exit
 
 import binascii  # hex encoding
+import hashlib
 
   # https requests
 
@@ -12,8 +13,8 @@ import platform
 import subprocess
 import datetime
 import sys
-import requests
 import os
+import requests
 from requests_toolbelt.adapters.fingerprint import FingerprintAdapter
 
 try:
@@ -28,9 +29,6 @@ except ModuleNotFoundError:
     time.sleep(1.5)
     exit(0)
 
-
-
-
 class api:
     name = ownerid = secret = version = ""
 
@@ -42,12 +40,17 @@ class api:
         self.secret = secret
 
         self.version = version
+        self.init()
 
     sessionid = enckey = ""
     initialized = False
 
     def init(self):
-
+        if sessionid != "":
+            print("You've already initialized!")
+            time.sleep(2)
+            exit(0)
+        
         init_iv = SHA256.new(str(uuid4())[:8].encode()).hexdigest()
 
         self.enckey = SHA256.new(str(uuid4())[:8].encode()).hexdigest()
@@ -55,6 +58,7 @@ class api:
         post_data = {
             "type": binascii.hexlify(("init").encode()),
             "ver": encryption.encrypt(self.version, self.secret, init_iv),
+            "hash": self.getchecksum(),
             "enckey": encryption.encrypt(self.enckey, self.secret, init_iv),
             "name": binascii.hexlify(self.name.encode()),
             "ownerid": binascii.hexlify(self.ownerid.encode()),
@@ -86,6 +90,7 @@ class api:
 
         self.sessionid = json["sessionid"]
         self.initialized = True
+        self.__load_app_data(json["appinfo"])
 
 
 
@@ -410,7 +415,18 @@ class api:
         if not self.initialized:
             print("Initialize first, in order to use the functions")
             sys.exit()
-        
+    
+    def getchecksum(self):
+        path = os.path.realpath(__file__)
+        md5_hash = hashlib.md5()
+
+        a_file = open(path, "rb")
+        content = a_file.read()
+        md5_hash.update(content)
+
+        digest = md5_hash.hexdigest()
+        return digest
+
     def __do_request(self, post_data):
 
         rq_out = requests.post(
@@ -419,11 +435,21 @@ class api:
 
         return rq_out.text
 
+    class application_data_class:
+        numUsers = numKeys = app_ver = customer_panel = onlineUsers = ""
     # region user_data
     class user_data_class:
         username = ip = hwid = expires = createdate = lastlogin = subscription = ""
 
     user_data = user_data_class()
+    app_data = application_data_class()
+
+    def __load_app_data(self, data):
+        self.app_data.numUsers = data["numUsers"]
+        self.app_data.numKeys = data["numKeys"]
+        self.app_data.app_ver = data["version"]
+        self.app_data.customer_panel = data["customerPanelLink"]
+        self.app_data.onlineUsers = data["numOnlineUsers"]
 
     def __load_user_data(self, data):
         self.user_data.username = data["username"]
