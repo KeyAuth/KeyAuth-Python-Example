@@ -3,7 +3,6 @@ import json as jsond  # json
 import time  # sleep before exit
 
 import binascii  # hex encoding
-import hashlib
 
   # https requests
 
@@ -30,9 +29,9 @@ except ModuleNotFoundError:
     exit(0)
 
 class api:
-    name = ownerid = secret = version = ""
+    name = ownerid = secret = version = hash_to_check = ""
 
-    def __init__(self, name, ownerid, secret, version):
+    def __init__(self, name, ownerid, secret, version, hash_to_check):
         self.name = name
 
         self.ownerid = ownerid
@@ -40,17 +39,18 @@ class api:
         self.secret = secret
 
         self.version = version
+        self.hash_to_check = hash_to_check
         self.init()
 
     sessionid = enckey = ""
     initialized = False
 
     def init(self):
+
         if self.sessionid != "":
             print("You've already initialized!")
             time.sleep(2)
             exit(0)
-        
         init_iv = SHA256.new(str(uuid4())[:8].encode()).hexdigest()
 
         self.enckey = SHA256.new(str(uuid4())[:8].encode()).hexdigest()
@@ -58,7 +58,7 @@ class api:
         post_data = {
             "type": binascii.hexlify(("init").encode()),
             "ver": encryption.encrypt(self.version, self.secret, init_iv),
-            "hash": self.getchecksum(),
+            "hash": self.hash_to_check,
             "enckey": encryption.encrypt(self.enckey, self.secret, init_iv),
             "name": binascii.hexlify(self.name.encode()),
             "ownerid": binascii.hexlify(self.ownerid.encode()),
@@ -415,17 +415,6 @@ class api:
         if not self.initialized:
             print("Initialize first, in order to use the functions")
             sys.exit()
-    
-    def getchecksum(self):
-        path = os.path.realpath(__file__)
-        md5_hash = hashlib.md5()
-
-        a_file = open(path, "rb")
-        content = a_file.read()
-        md5_hash.update(content)
-
-        digest = md5_hash.hexdigest()
-        return digest
 
     def __do_request(self, post_data):
 
