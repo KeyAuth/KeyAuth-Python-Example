@@ -3,6 +3,7 @@ import os
 import sys
 import os.path
 import platform
+import hashlib
 from time import sleep
 from datetime import datetime
 
@@ -10,11 +11,20 @@ from datetime import datetime
 os.system("cls")
 os.system("title Python Example")
 print("Initializing")
+def getchecksum():
+    path = os.path.realpath(__file__)
+    md5_hash = hashlib.md5()
+    a_file = open(path, "rb")
+    content = a_file.read()
+    md5_hash.update(content)
+    digest = md5_hash.hexdigest()
+    return digest
 keyauthapp = api(
 	name = "",
 	ownerid = "",
 	secret = "",
 	version = "1.0",
+	hash_to_check = getchecksum()
 )
 print ("""
 1.Login
@@ -34,7 +44,7 @@ sleep(1.5) # rate limit
 print(f"Current Session Validation Status: {keyauthapp.check()}")
 sleep(1.5) # rate limit
 print(f"Blacklisted? : {keyauthapp.checkblacklist()}") # check if blacklisted, you can edit this and make it exit the program if blacklisted
-
+sleep(1.5)
 ans=input("Select Option: ") 
 if ans=="1": 
 	user = input('Provide username: ')
