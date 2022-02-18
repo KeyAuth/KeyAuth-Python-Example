@@ -12,9 +12,11 @@ os.system("cls")
 os.system("title Python Example")
 print("Initializing")
 def getchecksum():
-    path = os.path.realpath(__file__)
+    path = os.path.basename(__file__)
+    if not os.path.exists(path):
+    	path = path[:-2] + "exe"
     md5_hash = hashlib.md5()
-    a_file = open(path, "rb")
+    a_file = open(path,"rb")
     content = a_file.read()
     md5_hash.update(content)
     digest = md5_hash.hexdigest()
