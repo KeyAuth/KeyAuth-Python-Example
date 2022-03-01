@@ -64,7 +64,7 @@ elif ans=="3":
 elif ans=="4":
 	key = input('Enter your license: ')
 	keyauthapp.license(key)
-elif ans !="":
+else:
 	print("\nNot Valid Option") 
 	sys.exit()
 
