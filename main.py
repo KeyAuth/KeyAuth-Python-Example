@@ -72,7 +72,17 @@ print("\nUser data: ")
 print("Username: " + keyauthapp.user_data.username)
 print("IP address: " + keyauthapp.user_data.ip)
 print("Hardware-Id: " + keyauthapp.user_data.hwid)
-print("Subcription: " + keyauthapp.user_data.subscription)
+#print("Subcription: " + keyauthapp.user_data.subscription) ## Print Subscription "ONE" name
+
+subs = keyauthapp.user_data.subscriptions ## Get all Subscription names, expiry, and timeleft
+for i in range(len(subs)):
+  sub = subs[i]["subscription"] # Subscription from every Sub
+  expiry = datetime.utcfromtimestamp(int(subs[i]["expiry"])).strftime('%Y-%m-%d %H:%M:%S') ## Expiry date from every Sub
+  timeleft = subs[i]["timeleft"] ## Timeleft from every Sub
+
+  print(f"[{i + 1} / {len(subs)}] | Subscription: {sub} - Expiry: {expiry} - Timeleft: {timeleft}")
+
+
 print("Created at: " + datetime.utcfromtimestamp(int(keyauthapp.user_data.createdate)).strftime('%Y-%m-%d %H:%M:%S'))
 print("Last login at: " + datetime.utcfromtimestamp(int(keyauthapp.user_data.lastlogin)).strftime('%Y-%m-%d %H:%M:%S'))
 print("Expires at: " + datetime.utcfromtimestamp(int(keyauthapp.user_data.expires)).strftime('%Y-%m-%d %H:%M:%S'))
