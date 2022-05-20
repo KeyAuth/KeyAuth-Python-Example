@@ -448,6 +448,7 @@ class api:
         self.user_data.createdate = data["createdate"]
         self.user_data.lastlogin = data["lastlogin"]
         self.user_data.subscription = data["subscriptions"][0]["subscription"]
+        self.user_data.subscriptions = data["subscriptions"]
 
 
 
