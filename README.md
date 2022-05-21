@@ -3,7 +3,7 @@ KeyAuth Python Example For The https://keyauth.win Authentication system.
 
 # Instructions
 
-Install Python (make sure to add to PATH)
+Install [Python](https://www.python.org/downloads/) (make sure to add to PATH)
 
 Open Command Prompt
 

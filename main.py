@@ -21,6 +21,7 @@ def getchecksum():
     md5_hash.update(content)
     digest = md5_hash.hexdigest()
     return digest
+
 keyauthapp = api(
 	name = "",
 	ownerid = "",
@@ -67,6 +68,42 @@ elif ans=="4":
 else:
 	print("\nNot Valid Option") 
 	sys.exit()
+
+
+#region Extra Functions
+
+#* Download Files form the server to your computer using the download function in the api class
+#bytes = keyauthapp.download("FILEID")
+#f = open("example.exe", "wb")
+#f.write(bytes)
+#f.close()
+
+
+#* Set up user variable
+#keyauthapp.setvar("varName", "varValue")
+
+#* Get user variable and print it
+#data = keyauthapp.getvar("varName")
+#print(data)
+
+#* Get normal variable and print it
+#data = keyauthapp.var("varName")
+#print(data)
+
+#* Log message to the server and then to your webhook what is set on app settings
+#keyauthapp.log("Message")
+
+#* Get if the user pc have been blacklisted
+#print(f"Blacklisted? : {keyauthapp.checkblacklist()}")
+
+#* See if the current session is validated
+#print(f"Session Validated?: {keyauthapp.check()}")
+
+
+#* example to send normal request with no POST data
+#data = keyauthapp.webhook("WebhookID", "?type=resetuser&user=username")
+
+#endregion
 
 print("\nUser data: ") 
 print("Username: " + keyauthapp.user_data.username)
