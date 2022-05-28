@@ -114,13 +114,12 @@ class api:
         }
 
         response = self.__do_request(post_data)
-
         response = encryption.decrypt(response, self.enckey, init_iv)
-
         json = jsond.loads(response)
 
         if json["success"]:
             print("successfully registered")
+            self.__load_user_data(json["info"])
         else:
             print(json["message"])
             sys.exit()
@@ -147,6 +146,8 @@ class api:
 
         if json["success"]:
             print("successfully upgraded user")
+            print("please restart program and login")
+            sys.exit()
         else:
             print(json["message"])
             sys.exit()

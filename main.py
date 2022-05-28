@@ -29,12 +29,6 @@ keyauthapp = api(
 	version = "1.0",
 	hash_to_check = getchecksum()
 )
-print ("""
-1.Login
-2.Register
-3.Upgrade
-4.License Key Only
-""")
 print(f"""
 App data:
 Number of users: {keyauthapp.app_data.numUsers}
@@ -43,11 +37,14 @@ Number of keys: {keyauthapp.app_data.numKeys}
 Application Version: {keyauthapp.app_data.app_ver}
 Customer panel link: {keyauthapp.app_data.customer_panel}
 """)
-sleep(1.5) # rate limit
 print(f"Current Session Validation Status: {keyauthapp.check()}")
-sleep(1.5) # rate limit
 print(f"Blacklisted? : {keyauthapp.checkblacklist()}") # check if blacklisted, you can edit this and make it exit the program if blacklisted
-sleep(1.5)
+print ("""
+1.Login
+2.Register
+3.Upgrade
+4.License Key Only
+""")
 ans=input("Select Option: ") 
 if ans=="1": 
 	user = input('Provide username: ')
@@ -62,6 +59,7 @@ elif ans=="3":
 	user = input('Provide username: ')
 	license = input('Provide License: ')
 	keyauthapp.upgrade(user,license)
+    
 elif ans=="4":
 	key = input('Enter your license: ')
 	keyauthapp.license(key)
