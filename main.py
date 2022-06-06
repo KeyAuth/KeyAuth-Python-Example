@@ -12,15 +12,15 @@ os.system("cls")
 os.system("title Python Example")
 print("Initializing")
 def getchecksum():
-    path = os.path.basename(__file__)
-    if not os.path.exists(path):
-    	path = path[:-2] + "exe"
-    md5_hash = hashlib.md5()
-    a_file = open(path,"rb")
-    content = a_file.read()
-    md5_hash.update(content)
-    digest = md5_hash.hexdigest()
-    return digest
+	path = os.path.basename(__file__)
+	if not os.path.exists(path):
+		path = path[:-2] + "exe"
+	md5_hash = hashlib.md5()
+	a_file = open(path,"rb")
+	content = a_file.read()
+	md5_hash.update(content)
+	digest = md5_hash.hexdigest()
+	return digest
 
 keyauthapp = api(
 	name = "",
@@ -124,4 +124,4 @@ print("Expires at: " + datetime.utcfromtimestamp(int(keyauthapp.user_data.expire
 print(f"Current Session Validation Status: {keyauthapp.check()}")
 print("Exiting in 10 secs....")
 sleep(10)
-exit(0)
+sys.exit(0)
