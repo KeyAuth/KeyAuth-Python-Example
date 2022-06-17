@@ -457,10 +457,9 @@ class others:
     @staticmethod
     def get_hwid():
         if platform.system() != "Windows":
-            f = open("/etc/machine-id")
-            hwid = f.read()
-            f.close()
-            return hwid
+            with open("/etc/machine-id") as f:
+                hwid = f.read()
+                return hwid
 
         cmd = subprocess.Popen(
             "wmic useraccount where name='%username%' get sid", stdout=subprocess.PIPE, shell=True)
