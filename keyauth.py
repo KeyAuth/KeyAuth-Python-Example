@@ -1,3 +1,4 @@
+import win32security #get sid
 import json as jsond  # json
 
 import time  # sleep before exit
@@ -456,19 +457,16 @@ class api:
 class others:
     @staticmethod
     def get_hwid():
+        winuser = os.getlogin()
         if platform.system() != "Windows":
             with open("/etc/machine-id") as f:
                 hwid = f.read()
                 return hwid
 
-        cmd = subprocess.Popen(
-            "wmic useraccount where name='%username%' get sid", stdout=subprocess.PIPE, shell=True)
+        sid = win32security.LookupAccountName(None, winuser)[0]
+        sidstr = win32security.ConvertSidToStringSid(sid)
 
-        (suppost_sid, error) = cmd.communicate()
-
-        suppost_sid = suppost_sid.split(b'\n')[1].strip()
-
-        return suppost_sid.decode()
+        return sidstr
 
 
 class encryption:
