@@ -412,6 +412,78 @@ class api:
         }
 
         self.__do_request(post_data)
+    
+    def fetchOnline(self): 
+        self.checkinit()
+        init_iv = SHA256.new(str(uuid4())[:8].encode()).hexdigest()
+
+        post_data = {
+            "type": binascii.hexlify(("fetchOnline").encode()),
+            "sessionid": binascii.hexlify(self.sessionid.encode()),
+            "name": binascii.hexlify(self.name.encode()),
+            "ownerid": binascii.hexlify(self.ownerid.encode()),
+            "init_iv": init_iv
+        }
+
+        response = self.__do_request(post_data)
+        response = encryption.decrypt(response, self.enckey, init_iv)
+
+        json = jsond.loads(response)
+        
+        if json["success"]:
+            if json["users"]["0"]:
+                return None ## THIS IS ISSUE ON KEYAUTH SERVER SIDE 6.8.2022 so it will return none if it is not an array.
+            else: 
+                return json["users"]
+        else: 
+            return None
+
+    def chatGet(self, channel):
+        self.checkinit()
+        init_iv = SHA256.new(str(uuid4())[:8].encode()).hexdigest()
+
+        post_data = {
+            "type": binascii.hexlify(("chatget").encode()),
+            "channel": encryption.encrypt(channel, self.enckey, init_iv),
+            "sessionid": binascii.hexlify(self.sessionid.encode()),
+            "name": binascii.hexlify(self.name.encode()),
+            "ownerid": binascii.hexlify(self.ownerid.encode()),
+            "init_iv": init_iv
+        }
+
+        response = self.__do_request(post_data)
+        response = encryption.decrypt(response, self.enckey, init_iv)
+
+        json = jsond.loads(response)
+
+        if json["success"]:
+            return json["messages"]
+        else:
+            return None
+
+    def chatSend(self, message, channel): 
+        self.checkinit()
+        init_iv = SHA256.new(str(uuid4())[:8].encode()).hexdigest()
+
+        post_data = {
+            "type": binascii.hexlify(("chatsend").encode()),
+            "message": encryption.encrypt(message, self.enckey, init_iv),
+            "channel": encryption.encrypt(channel, self.enckey, init_iv),
+            "sessionid": binascii.hexlify(self.sessionid.encode()),
+            "name": binascii.hexlify(self.name.encode()),
+            "ownerid": binascii.hexlify(self.ownerid.encode()),
+            "init_iv": init_iv
+        }
+
+        response = self.__do_request(post_data)
+        response = encryption.decrypt(response, self.enckey, init_iv)
+
+        json = jsond.loads(response)
+
+        if json["success"]:
+            return True
+        else:
+            return False
 
     def checkinit(self):
         if not self.initialized:
@@ -430,7 +502,7 @@ class api:
         numUsers = numKeys = app_ver = customer_panel = onlineUsers = ""
     # region user_data
     class user_data_class:
-        username = ip = hwid = expires = createdate = lastlogin = subscription = ""
+        username = ip = hwid = expires = createdate = lastlogin = subscription = subscriptions ""
 
     user_data = user_data_class()
     app_data = application_data_class()

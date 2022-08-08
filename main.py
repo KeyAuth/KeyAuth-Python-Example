@@ -29,6 +29,7 @@ keyauthapp = api(
 	version = "1.0",
 	hash_to_check = getchecksum()
 )
+
 print(f"""
 App data:
 Number of users: {keyauthapp.app_data.numUsers}
@@ -101,6 +102,18 @@ else:
 #* example to send normal request with no POST data
 #data = keyauthapp.webhook("WebhookID", "?type=resetuser&user=username")
 
+#* Get chat messages
+#messages = keyauthapp.chatGet("CHANNEL")
+
+#Messages = ""
+#for i in range(len(messages)):
+#	Messages += datetime.utcfromtimestamp(int(messages[i]["timestamp"])).strftime('%Y-%m-%d %H:%M:%S') + " - " + messages[i]["author"] + ": " + messages[i]["message"] + "\n"
+
+#print("\n\n" + Messages)
+
+#* Send chat message
+#keyauthapp.chatSend("MESSAGE", "CHANNEL")
+
 #endregion
 
 print("\nUser data: ") 
@@ -116,6 +129,16 @@ for i in range(len(subs)):
   timeleft = subs[i]["timeleft"] ## Timeleft from every Sub
 
   print(f"[{i + 1} / {len(subs)}] | Subscription: {sub} - Expiry: {expiry} - Timeleft: {timeleft}")
+
+onlineUsers = keyauthapp.fetchOnline()
+OU = "" ## KEEP THIS EMPTY FOR NOW, THIS WILL BE USED TO CREATE ONLINE USER STRING.
+if onlineUsers == None: 
+	OU = "No online users"
+else:
+	for i in range(len(onlineUsers)):
+	    OU += onlineUsers[i]["credential"] + " "
+
+print("\n" + OU + "\n")
 
 
 print("Created at: " + datetime.utcfromtimestamp(int(keyauthapp.user_data.createdate)).strftime('%Y-%m-%d %H:%M:%S'))
