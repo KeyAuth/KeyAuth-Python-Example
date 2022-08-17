@@ -502,7 +502,7 @@ class api:
         numUsers = numKeys = app_ver = customer_panel = onlineUsers = ""
     # region user_data
     class user_data_class:
-        username = ip = hwid = expires = createdate = lastlogin = subscription = subscriptions ""
+        username = ip = hwid = expires = createdate = lastlogin = subscription = subscriptions = ""
 
     user_data = user_data_class()
     app_data = application_data_class()
