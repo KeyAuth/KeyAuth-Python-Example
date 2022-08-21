@@ -431,7 +431,7 @@ class api:
         json = jsond.loads(response)
         
         if json["success"]:
-            if json["users"]["0"]:
+            if len(json["users"]) == 0:
                 return None ## THIS IS ISSUE ON KEYAUTH SERVER SIDE 6.8.2022 so it will return none if it is not an array.
             else: 
                 return json["users"]
