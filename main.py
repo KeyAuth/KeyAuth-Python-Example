@@ -1,11 +1,12 @@
 from keyauth import api
 import os
-import sys
 import os.path
-import platform
 import hashlib
 from time import sleep
 from datetime import datetime
+
+#import json as jsond 
+#^^ only for auto login/json writing/reading
 
 # watch setup video if you need help https://www.youtube.com/watch?v=L2eAQOmuUiA
 os.system("cls")
@@ -23,11 +24,11 @@ def getchecksum():
 	return digest
 
 keyauthapp = api(
-	name = "",
-	ownerid = "",
-	secret = "",
-	version = "1.0",
-	hash_to_check = getchecksum()
+    name = "", #App name (Manage Applications --> Application name)
+    ownerid = "", #Owner ID (Account-Settings --> OwnerID)
+    secret = "", #App secret(Manage Applications --> App credentials code)
+    version = "1.0",
+    hash_to_check = getchecksum()
 )
 
 print(f"""
@@ -66,7 +67,7 @@ elif ans=="4":
 	keyauthapp.license(key)
 else:
 	print("\nNot Valid Option") 
-	sys.exit()
+	os._exit(1)
 
 
 #region Extra Functions
@@ -114,7 +115,120 @@ else:
 #* Send chat message
 #keyauthapp.chatSend("MESSAGE", "CHANNEL")
 
+
+#* Auto-Login Example (THIS IS JUST AN EXAMPLE --> YOU WILL HAVE TO EDIT THE CODE PROBABLY)
+#1. Checking and Reading JSON
+
+#### Note: Remove the ''' on line 124 and 183
+
+'''try:
+	if os.path.isfile('auth.json'): #Checking if the auth file exist
+		if jsond.load(open("auth.json"))["authusername"] == "": #Checks if the authusername is empty or not
+			print("""
+1. Login
+2. Register
+			""")
+			ans=input("Select Option: ")  #Skipping auto-login bc auth file is empty
+			if ans=="1": 
+				user = input('Provide username: ')
+				password = input('Provide password: ')
+				keyauthapp.login(user,password)
+			elif ans=="2":
+				user = input('Provide username: ')
+				password = input('Provide password: ')
+				license = input('Provide License: ')
+				keyauthapp.register(user,password,license) 
+			else:
+				print("\nNot Valid Option") 
+				os._exit(1) 
+		else:
+			try: #2. Auto login
+				with open('auth.json', 'r') as f:
+					authfile = jsond.load(f)
+					authuser = authfile.get('authusername')
+					authpass = authfile.get('authpassword')
+					keyauthapp.login(authuser,authpass)
+			except Exception as e: #Error stuff
+				print(e)
+	else: #Creating auth file bc its missing
+		try:
+			f = open("auth.json", "a") #Writing content
+			f.write("""{
+	"authusername": "",
+	"authpassword": ""
+}""")
+			f.close()
+			print ("""
+1. Login
+2. Register
+			""")#Again skipping auto-login bc the file is empty/missing
+			ans=input("Select Option: ") 
+			if ans=="1": 
+				user = input('Provide username: ')
+				password = input('Provide password: ')
+				keyauthapp.login(user,password)
+			elif ans=="2":
+				user = input('Provide username: ')
+				password = input('Provide password: ')
+				license = input('Provide License: ')
+				keyauthapp.register(user,password,license) 
+			else:
+				print("\nNot Valid Option") 
+				os._exit(1) 
+		except Exception as e: #Error stuff
+			print(e)
+			os._exit(1) 
+except Exception as e: #Error stuff
+	print(e)
+	os._exit(1)'''
+
+
+#Writing user data on login:
+#Check Keyauth.py file --> Line 152
+#Replace the whole login function with this login function (This has auto user data dumping, so the user only have to login once)
+#Note: The auto login function above is needed for this bc it creates the auth file, if the auth file is missing this wont work
+
+'''def login(self, user, password, hwid=None):
+	self.checkinit()
+	if hwid is None:
+		hwid = others.get_hwid()
+
+	init_iv = SHA256.new(str(uuid4())[:8].encode()).hexdigest()
+
+	post_data = {
+		"type": binascii.hexlify(("login").encode()),
+		"username": encryption.encrypt(user, self.enckey, init_iv),
+		"pass": encryption.encrypt(password, self.enckey, init_iv),
+		"hwid": encryption.encrypt(hwid, self.enckey, init_iv),
+		"sessionid": binascii.hexlify(self.sessionid.encode()),
+		"name": binascii.hexlify(self.name.encode()),
+		"ownerid": binascii.hexlify(self.ownerid.encode()),
+		"init_iv": init_iv
+	}
+
+	response = self.__do_request(post_data)
+
+	response = encryption.decrypt(response, self.enckey, init_iv)
+
+	json = jsond.loads(response)
+
+	if json["success"]:
+		self.__load_user_data(json["info"])
+		if jsond.load(open("auth.json"))["authusername"] == "": #Check if the authusername is empty so it can write the user data
+			authfile = jsond.load(open("Files/auth.json"))
+			authfile["authusername"] = user #login(self, user)
+			jsond.dump(authfile, open('Files/auth.json', 'w'), sort_keys=False, indent=4) #Dumping username to auth file/You can change the indent
+			authfile["authpassword"] = password #login(self, password)
+			jsond.dump(authfile, open('Files/auth.json', 'w'), sort_keys=False, indent=4) #Dumping password to auth file/You can change the indent 
+		else: #Auth file is filled with data so it skips the user data dumping
+			pass
+		print("successfully logged in")
+	else:
+		print(json["message"])
+		os._exit(1)'''
+
 #endregion
+
 
 print("\nUser data: ") 
 print("Username: " + keyauthapp.user_data.username)
@@ -147,4 +261,4 @@ print("Expires at: " + datetime.utcfromtimestamp(int(keyauthapp.user_data.expire
 print(f"Current Session Validation Status: {keyauthapp.check()}")
 print("Exiting in 10 secs....")
 sleep(10)
-sys.exit(0)
+os._exit(1)
