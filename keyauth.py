@@ -5,16 +5,10 @@ import time  # sleep before exit
 
 import binascii  # hex encoding
 
-  # https requests
-
 from uuid import uuid4  # gen random guid
-import webbrowser
 import platform
-import subprocess
-import datetime
-import sys
 import os
-import requests
+import requests # https requests
 from requests_toolbelt.adapters.fingerprint import FingerprintAdapter
 
 try:
@@ -70,7 +64,7 @@ class api:
 
         if response == "KeyAuth_Invalid":
             print("The application doesn't exist")
-            sys.exit()
+            os._exit(1)
 
         response = encryption.decrypt(response, self.secret, init_iv)
         json = jsond.loads(response)
@@ -80,14 +74,14 @@ class api:
                 print("New Version Available")
                 download_link = json["download"]
                 os.system(f"start {download_link}")
-                sys.exit()
+                os._exit(1)
             else:
                 print("Invalid Version, Contact owner to add download link to latest app version")
-                sys.exit()
+                os._exit(1)
 
         if not json["success"]:
             print(json["message"])
-            sys.exit()
+            os._exit(1)
 
         self.sessionid = json["sessionid"]
         self.initialized = True
@@ -123,7 +117,7 @@ class api:
             self.__load_user_data(json["info"])
         else:
             print(json["message"])
-            sys.exit()
+            os._exit(1)
 
     def upgrade(self, user, license):
         self.checkinit()
@@ -148,10 +142,10 @@ class api:
         if json["success"]:
             print("successfully upgraded user")
             print("please restart program and login")
-            sys.exit()
+            os._exit(1)
         else:
             print(json["message"])
-            sys.exit()
+            os._exit(1)
 
     def login(self, user, password, hwid=None):
         self.checkinit()
@@ -182,7 +176,7 @@ class api:
             print("successfully logged in")
         else:
             print(json["message"])
-            sys.exit()
+            os._exit(1)
 
     def license(self, key, hwid=None):
         self.checkinit()
@@ -211,7 +205,7 @@ class api:
             print("successfully logged into license")
         else:
             print(json["message"])
-            sys.exit()
+            os._exit(1)
 
     def var(self, name):
         self.checkinit()
@@ -237,7 +231,7 @@ class api:
         else:
             print(json["message"])
             time.sleep(5)
-            sys.exit()
+            os._exit(1)
 
     def getvar(self, var_name):
         self.checkinit()
@@ -260,7 +254,7 @@ class api:
         else:
             print(json["message"])
             time.sleep(5)
-            sys.exit()
+            os._exit(1)
 
     def setvar(self, var_name, var_data):
         self.checkinit()
@@ -283,7 +277,7 @@ class api:
         else:
             print(json["message"])
             time.sleep(5)
-            sys.exit()    
+            os._exit(1)    
 
     def ban(self):
         self.checkinit()
@@ -304,7 +298,7 @@ class api:
         else:
             print(json["message"])
             time.sleep(5)
-            sys.exit()    
+            os._exit(1)    
 
     def file(self, fileid):
         self.checkinit()
@@ -328,7 +322,7 @@ class api:
         if not json["success"]:
             print(json["message"])
             time.sleep(5)
-            sys.exit()
+            os._exit(1)
         return binascii.unhexlify(json["contents"])
 
     def webhook(self, webid, param):
@@ -355,7 +349,7 @@ class api:
         else:
             print(json["message"])
             time.sleep(5)
-            sys.exit()
+            os._exit(1)
 
     def check(self):
         self.checkinit()
@@ -488,7 +482,7 @@ class api:
     def checkinit(self):
         if not self.initialized:
             print("Initialize first, in order to use the functions")
-            sys.exit()
+            os._exit(1)
 
     def __do_request(self, post_data):
 
@@ -572,7 +566,7 @@ class encryption:
             return encryption.encrypt_string(message.encode(), _key.encode(), _iv.encode()).decode()
         except:
             print("Invalid Application Information. Long text is secret short text is ownerid. Name is supposed to be app name not username")
-            sys.exit()
+            os._exit(1)
 
     @staticmethod
     def decrypt(message, enc_key, iv):
@@ -584,4 +578,4 @@ class encryption:
             return encryption.decrypt_string(message.encode(), _key.encode(), _iv.encode()).decode()
         except:
             print("Invalid Application Information. Long text is secret short text is ownerid. Name is supposed to be app name not username")
-            sys.exit()
+            os._exit(1)
