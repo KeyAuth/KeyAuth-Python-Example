@@ -43,8 +43,7 @@ Application Version: {keyauthapp.app_data.app_ver}
 Customer panel link: {keyauthapp.app_data.customer_panel}
 """)
 print(f"Current Session Validation Status: {keyauthapp.check()}")
-print(
-    f"Blacklisted? : {keyauthapp.checkblacklist()}")  # check if blacklisted, you can edit this and make it exit the program if blacklisted
+print(f"Blacklisted? : {keyauthapp.checkblacklist()}")  # check if blacklisted, you can edit this and make it exit the program if blacklisted
 
 
 def answer():
