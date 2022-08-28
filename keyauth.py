@@ -1,4 +1,4 @@
-import win32security #get sid
+import win32security  # get sid
 import json as jsond  # json
 
 import time  # sleep before exit
@@ -8,22 +8,31 @@ import binascii  # hex encoding
 from uuid import uuid4  # gen random guid
 import platform
 import os
-import requests # https requests
-from requests_toolbelt.adapters.fingerprint import FingerprintAdapter
+import requests  # https requests
 
 try:
     from Crypto.Cipher import AES
     from Crypto.Hash import SHA256
-    from Crypto.Util.Padding import pad, unpad    
+    from Crypto.Util.Padding import pad, unpad
 except ModuleNotFoundError:
     print("Exception when importing modules")
     print("installing necessary modules....")
     os.system("pip install pycryptodome")
     print("Modules installed!")
     time.sleep(1.5)
-    exit(0)
+    os._exit(1)
+
+try:  # Connection check
+    s = requests.Session()  # Session
+    s.get('https://google.com')
+except requests.exceptions.RequestException as e:
+    print(e)
+    time.sleep(3)
+    os._exit(1)
+
 
 class api:
+
     name = ownerid = secret = version = hash_to_check = ""
 
     def __init__(self, name, ownerid, secret, version, hash_to_check):
@@ -45,7 +54,7 @@ class api:
         if self.sessionid != "":
             print("You've already initialized!")
             time.sleep(2)
-            exit(0)
+            os._exit(1)
         init_iv = SHA256.new(str(uuid4())[:8].encode()).hexdigest()
 
         self.enckey = SHA256.new(str(uuid4())[:8].encode()).hexdigest()
@@ -86,8 +95,6 @@ class api:
         self.sessionid = json["sessionid"]
         self.initialized = True
         self.__load_app_data(json["appinfo"])
-
-
 
     def register(self, user, password, license, hwid=None):
         self.checkinit()
@@ -142,6 +149,7 @@ class api:
         if json["success"]:
             print("successfully upgraded user")
             print("please restart program and login")
+            time.sleep(2)
             os._exit(1)
         else:
             print(json["message"])
@@ -271,13 +279,13 @@ class api:
         response = self.__do_request(post_data)
         response = encryption.decrypt(response, self.enckey, init_iv)
         json = jsond.loads(response)
-        
+
         if json["success"]:
             return True
         else:
             print(json["message"])
             time.sleep(5)
-            os._exit(1)    
+            os._exit(1)
 
     def ban(self):
         self.checkinit()
@@ -292,13 +300,13 @@ class api:
         response = self.__do_request(post_data)
         response = encryption.decrypt(response, self.enckey, init_iv)
         json = jsond.loads(response)
-        
+
         if json["success"]:
             return True
         else:
             print(json["message"])
             time.sleep(5)
-            os._exit(1)    
+            os._exit(1)
 
     def file(self, fileid):
         self.checkinit()
@@ -406,8 +414,8 @@ class api:
         }
 
         self.__do_request(post_data)
-    
-    def fetchOnline(self): 
+
+    def fetchOnline(self):
         self.checkinit()
         init_iv = SHA256.new(str(uuid4())[:8].encode()).hexdigest()
 
@@ -423,13 +431,13 @@ class api:
         response = encryption.decrypt(response, self.enckey, init_iv)
 
         json = jsond.loads(response)
-        
+
         if json["success"]:
             if len(json["users"]) == 0:
-                return None ## THIS IS ISSUE ON KEYAUTH SERVER SIDE 6.8.2022 so it will return none if it is not an array.
-            else: 
+                return None  # THIS IS ISSUE ON KEYAUTH SERVER SIDE 6.8.2022, so it will return none if it is not an array.
+            else:
                 return json["users"]
-        else: 
+        else:
             return None
 
     def chatGet(self, channel):
@@ -455,7 +463,7 @@ class api:
         else:
             return None
 
-    def chatSend(self, message, channel): 
+    def chatSend(self, message, channel):
         self.checkinit()
         init_iv = SHA256.new(str(uuid4())[:8].encode()).hexdigest()
 
@@ -482,19 +490,22 @@ class api:
     def checkinit(self):
         if not self.initialized:
             print("Initialize first, in order to use the functions")
+            time.sleep(2)
             os._exit(1)
 
     def __do_request(self, post_data):
-
-        rq_out = requests.post(
-            "https://keyauth.win/api/1.0/", data=post_data
-        )
-
-        return rq_out.text
+        try:
+            rq_out = s.post(
+                "https://keyauth.win/api/1.0/", data=post_data, timeout=30
+            )
+            return rq_out.text
+        except requests.exceptions.Timeout:
+            print("Request timed out")
 
     class application_data_class:
         numUsers = numKeys = app_ver = customer_panel = onlineUsers = ""
     # region user_data
+
     class user_data_class:
         username = ip = hwid = expires = createdate = lastlogin = subscription = subscriptions = ""
 
@@ -517,7 +528,6 @@ class api:
         self.user_data.lastlogin = data["lastlogin"]
         self.user_data.subscription = data["subscriptions"][0]["subscription"]
         self.user_data.subscriptions = data["subscriptions"]
-
 
 
 class others:
