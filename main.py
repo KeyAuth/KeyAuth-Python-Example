@@ -131,7 +131,7 @@ answer()
 # * Auto-Login Example (THIS IS JUST AN EXAMPLE --> YOU WILL HAVE TO EDIT THE CODE PROBABLY)
 # 1. Checking and Reading JSON
 
-#### Note: Remove the ''' on line 124 and 183
+#### Note: Remove the ''' on line 136 and 195
 
 '''try:
     if os.path.isfile('auth.json'): #Checking if the auth file exist
@@ -195,8 +195,8 @@ except Exception as e: #Error stuff
     os._exit(1)'''
 
 # Writing user data on login:
-# Check Keyauth.py file --> Line 152
-# Replace the whole login function with this login function (This has auto user data dumping, so the user only have to login once)
+# Check Keyauth.py file --> Line 158
+# Replace the whole login function with this login function (This has auto user data dumping, so the user only have to login once), dont forget to remove the ''' on line 202,239
 # Note: The auto login function above is needed for this bc it creates the auth file, if the auth file is missing this won't work
 
 '''def login(self, user, password, hwid=None):
