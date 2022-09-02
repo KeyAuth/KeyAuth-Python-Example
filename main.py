@@ -1,3 +1,5 @@
+import sys
+
 from keyauth import api
 import time
 import os
@@ -9,19 +11,15 @@ from datetime import datetime
 # ^^ only for auto login/json writing/reading
 
 # watch setup video if you need help https://www.youtube.com/watch?v=L2eAQOmuUiA
-os.system("cls")
-os.system("title Python Example")
+
+os.system("cls & title Python Example")
 print("Initializing")
 
 
 def getchecksum():
-    path = os.path.basename(__file__)
-    if not os.path.exists(path):
-        path = path[:-2] + "exe"
     md5_hash = hashlib.md5()
-    a_file = open(path, "rb")
-    content = a_file.read()
-    md5_hash.update(content)
+    file = open(''.join(sys.argv), "rb")
+    md5_hash.update(file.read())
     digest = md5_hash.hexdigest()
     return digest
 
@@ -34,7 +32,7 @@ keyauthapp = api(
     hash_to_check = getchecksum()
 )
 
-print(f"""
+print(f"""1
 App data:
 Number of users: {keyauthapp.app_data.numUsers}
 Number of online users: {keyauthapp.app_data.onlineUsers}
@@ -137,7 +135,7 @@ answer()
 # * Auto-Login Example (THIS IS JUST AN EXAMPLE --> YOU WILL HAVE TO EDIT THE CODE PROBABLY)
 # 1. Checking and Reading JSON
 
-#### Note: Remove the ''' on line 136 and 195
+#### Note: Remove the ''' on line 140 and 199
 
 '''try:
     if os.path.isfile('auth.json'): #Checking if the auth file exist
@@ -202,7 +200,7 @@ except Exception as e: #Error stuff
 
 # Writing user data on login:
 # Check Keyauth.py file --> Line 158
-# Replace the whole login function with this login function (This has auto user data dumping, so the user only have to login once), dont forget to remove the ''' on line 202,239
+# Replace the whole login function with this login function (This has auto user data dumping, so the user only have to log in once), don't forget to remove the ''' on line 206,243
 # Note: The auto login function above is needed for this bc it creates the auth file, if the auth file is missing this won't work
 
 '''def login(self, user, password, hwid=None):
