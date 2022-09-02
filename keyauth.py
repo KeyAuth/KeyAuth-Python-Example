@@ -333,7 +333,7 @@ class api:
             os._exit(1)
         return binascii.unhexlify(json["contents"])
 
-    def webhook(self, webid, param):
+    def webhook(self, webid, param, body = "", conttype = ""):
         self.checkinit()
         init_iv = SHA256.new(str(uuid4())[:8].encode()).hexdigest()
 
@@ -341,6 +341,8 @@ class api:
             "type": binascii.hexlify(("webhook").encode()),
             "webid": encryption.encrypt(webid, self.enckey, init_iv),
             "params": encryption.encrypt(param, self.enckey, init_iv),
+            "body": encryption.encrypt(body, self.enckey, init_iv),
+            "conttype": encryption.encrypt(conttype, self.enckey, init_iv),
             "sessionid": binascii.hexlify(self.sessionid.encode()),
             "name": binascii.hexlify(self.name.encode()),
             "ownerid": binascii.hexlify(self.ownerid.encode()),

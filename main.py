@@ -115,6 +115,12 @@ answer()
 # * example to send normal request with no POST data
 # data = keyauthapp.webhook("WebhookID", "?type=resetuser&user=username")
 
+# * example to send form data
+# data = keyauthapp.webhook("WebhookID", "", "type=init&name=test&ownerid=j9Gj0FTemM", "application/x-www-form-urlencoded")
+
+# * example to send JSON
+# data = keyauthapp.webhook("WebhookID", "", "{\"content\": \"webhook message here\",\"embeds\": null}", "application/json")
+
 # * Get chat messages
 # messages = keyauthapp.chatGet("CHANNEL")
 
