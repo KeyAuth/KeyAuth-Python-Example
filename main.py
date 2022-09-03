@@ -32,7 +32,7 @@ keyauthapp = api(
     hash_to_check = getchecksum()
 )
 
-print(f"""1
+print(f"""
 App data:
 Number of users: {keyauthapp.app_data.numUsers}
 Number of online users: {keyauthapp.app_data.onlineUsers}
