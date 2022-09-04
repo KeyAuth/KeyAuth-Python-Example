@@ -135,6 +135,9 @@ answer()
 # * Auto-Login Example (THIS IS JUST AN EXAMPLE --> YOU WILL HAVE TO EDIT THE CODE PROBABLY)
 # 1. Checking and Reading JSON
 
+# * Add Application Information to Title
+# os.system(f"cls & title KeyAuth Python Example - Total Users: {keyauthapp.app_data.numUsers} - Online Users: {keyauthapp.app_data.onlineUsers} - Total Keys: {keyauthapp.app_data.numKeys}")
+
 #### Note: Remove the ''' on line 140 and 199
 
 '''try:
