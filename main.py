@@ -149,11 +149,19 @@ answer()
                 user = input('Provide username: ')
                 password = input('Provide password: ')
                 keyauthapp.login(user,password)
+                authfile = jsond.load(open("auth.json"))
+                authfile["authusername"] = user
+                authfile["authpassword"] = password
+                jsond.dump(authfile, open('auth.json', 'w'), sort_keys=False, indent=4)
             elif ans=="2":
                 user = input('Provide username: ')
                 password = input('Provide password: ')
                 license = input('Provide License: ')
                 keyauthapp.register(user,password,license) 
+                authfile = jsond.load(open("auth.json"))
+                authfile["authusername"] = user
+                authfile["authpassword"] = password
+                jsond.dump(authfile, open('auth.json', 'w'), sort_keys=False, indent=4)
             else:
                 print("\nNot Valid Option") 
                 os._exit(1) 
@@ -183,11 +191,19 @@ answer()
                 user = input('Provide username: ')
                 password = input('Provide password: ')
                 keyauthapp.login(user,password)
+                authfile = jsond.load(open("auth.json"))
+                authfile["authusername"] = user
+                authfile["authpassword"] = password
+                jsond.dump(authfile, open('auth.json', 'w'), sort_keys=False, indent=4)
             elif ans=="2":
                 user = input('Provide username: ')
                 password = input('Provide password: ')
                 license = input('Provide License: ')
-                keyauthapp.register(user,password,license) 
+                keyauthapp.register(user,password,license)
+                authfile = jsond.load(open("auth.json"))
+                authfile["authusername"] = user
+                authfile["authpassword"] = password
+                jsond.dump(authfile, open('auth.json', 'w'), sort_keys=False, indent=4)
             else:
                 print("\nNot Valid Option") 
                 os._exit(1) 
@@ -197,50 +213,6 @@ answer()
 except Exception as e: #Error stuff
     print(e)
     os._exit(1)'''
-
-# Writing user data on login:
-# Check Keyauth.py file --> Line 158
-# Replace the whole login function with this login function (This has auto user data dumping, so the user only have to log in once), don't forget to remove the ''' on line 206,243
-# Note: The auto login function above is needed for this bc it creates the auth file, if the auth file is missing this won't work
-
-'''def login(self, user, password, hwid=None):
-    self.checkinit()
-    if hwid is None:
-        hwid = others.get_hwid()
-
-    init_iv = SHA256.new(str(uuid4())[:8].encode()).hexdigest()
-
-    post_data = {
-        "type": binascii.hexlify(("login").encode()),
-        "username": encryption.encrypt(user, self.enckey, init_iv),
-        "pass": encryption.encrypt(password, self.enckey, init_iv),
-        "hwid": encryption.encrypt(hwid, self.enckey, init_iv),
-        "sessionid": binascii.hexlify(self.sessionid.encode()),
-        "name": binascii.hexlify(self.name.encode()),
-        "ownerid": binascii.hexlify(self.ownerid.encode()),
-        "init_iv": init_iv
-    }
-
-    response = self.__do_request(post_data)
-
-    response = encryption.decrypt(response, self.enckey, init_iv)
-
-    json = jsond.loads(response)
-
-    if json["success"]:
-        self.__load_user_data(json["info"])
-        if jsond.load(open("auth.json"))["authusername"] == "": #Check if the authusername is empty so it can write the user data
-            authfile = jsond.load(open("Files/auth.json"))
-            authfile["authusername"] = user #login(self, user)
-            jsond.dump(authfile, open('Files/auth.json', 'w'), sort_keys=False, indent=4) #Dumping username to auth file/You can change the indent
-            authfile["authpassword"] = password #login(self, password)
-            jsond.dump(authfile, open('Files/auth.json', 'w'), sort_keys=False, indent=4) #Dumping password to auth file/You can change the indent 
-        else: #Auth file is filled with data so it skips the user data dumping
-            pass
-        print("successfully logged in")
-    else:
-        print(json["message"])
-        os._exit(1)'''
 
 # endregion
 
