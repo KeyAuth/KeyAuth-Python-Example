@@ -1,6 +1,6 @@
-import sys
-
 from keyauth import api
+
+import sys
 import time
 import os
 import hashlib
@@ -12,7 +12,12 @@ from datetime import datetime
 
 # watch setup video if you need help https://www.youtube.com/watch?v=L2eAQOmuUiA
 
-os.system("cls & title Python Example")
+if os.name == 'nt':
+    os.system('cls & title Python Example')
+else:
+    os.system('clear')
+    sys.stdout.write("\x1b]0;Python Example\x07")
+
 print("Initializing")
 
 
@@ -131,14 +136,13 @@ answer()
 # * Send chat message
 # keyauthapp.chatSend("MESSAGE", "CHANNEL")
 
+# * Add Application Information to Title
+# os.system(f"cls & title KeyAuth Python Example - Total Users: {keyauthapp.app_data.numUsers} - Online Users: {keyauthapp.app_data.onlineUsers} - Total Keys: {keyauthapp.app_data.numKeys}")
 
 # * Auto-Login Example (THIS IS JUST AN EXAMPLE --> YOU WILL HAVE TO EDIT THE CODE PROBABLY)
 # 1. Checking and Reading JSON
 
-# * Add Application Information to Title
-# os.system(f"cls & title KeyAuth Python Example - Total Users: {keyauthapp.app_data.numUsers} - Online Users: {keyauthapp.app_data.onlineUsers} - Total Keys: {keyauthapp.app_data.numKeys}")
-
-#### Note: Remove the ''' on line 140 and 199
+#### Note: Remove the ''' on line 147 and 222
 
 '''try:
     if os.path.isfile('auth.json'): #Checking if the auth file exist
