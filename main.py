@@ -88,7 +88,7 @@ answer()
 # region Extra Functions
 
 # * Download Files form the server to your computer using the download function in the api class
-# bytes = keyauthapp.download("FILEID")
+# bytes = keyauthapp.file("FILEID")
 # f = open("example.exe", "wb")
 # f.write(bytes)
 # f.close()
