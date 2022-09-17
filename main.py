@@ -8,7 +8,7 @@ import hashlib
 from time import sleep
 from datetime import datetime
 
-# import json as jsonds
+# import json as jsond
 # ^^ only for auto login/json writing/reading
 
 # watch setup video if you need help https://www.youtube.com/watch?v=L2eAQOmuUiA
