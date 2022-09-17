@@ -2,21 +2,25 @@ from keyauth import api
 
 import sys
 import time
+import platform
 import os
 import hashlib
 from time import sleep
 from datetime import datetime
 
-# import json as jsond
+# import json as jsonds
 # ^^ only for auto login/json writing/reading
 
 # watch setup video if you need help https://www.youtube.com/watch?v=L2eAQOmuUiA
 
-if os.name == 'nt':
-    os.system('cls & title Python Example')
-else:
-    os.system('clear')
-    sys.stdout.write("\x1b]0;Python Example\x07")
+if platform.system() == 'Windows':
+    os.system('cls & title Python Example')  # clear console, change title
+elif platform.system() == 'Linux':
+    os.system('clear')  # clear console
+    sys.stdout.write("\x1b]0;Python Example\x07")  # change title
+elif platform.system() == 'Darwin':
+    os.system("clear && printf '\e[3J'")  # clear console
+    os.system('''echo - n - e "\033]0;Python Example\007"''')  # change title
 
 print("Initializing")
 
@@ -142,7 +146,7 @@ answer()
 # * Auto-Login Example (THIS IS JUST AN EXAMPLE --> YOU WILL HAVE TO EDIT THE CODE PROBABLY)
 # 1. Checking and Reading JSON
 
-#### Note: Remove the ''' on line 147 and 222
+#### Note: Remove the ''' on line 151 and 226
 
 '''try:
     if os.path.isfile('auth.json'): #Checking if the auth file exist
