@@ -3,7 +3,8 @@ import json as jsond  # json
 import time  # sleep before exit
 import binascii  # hex encoding
 from uuid import uuid4  # gen random guid
-import platform
+import platform  # check platform
+import subprocess  # needed for mac device
 
 try:
     if os.name == 'nt':
@@ -538,16 +539,21 @@ class api:
 class others:
     @staticmethod
     def get_hwid():
-        winuser = os.getlogin()
-        if platform.system() != "Windows":
+        if platform.system() == "Linux":
             with open("/etc/machine-id") as f:
                 hwid = f.read()
                 return hwid
+        elif platform.system() == 'Windows':
+            winuser = os.getlogin()
+            sid = win32security.LookupAccountName(None, winuser)[0]
+            hwid = win32security.ConvertSidToStringSid(sid)
+            return hwid
+        elif platform.system() == 'Darwin':
+            output = subprocess.Popen("ioreg -l | grep IOPlatformSerialNumber", stdout=subprocess.PIPE, shell=True).communicate()[0]
+            serial = output.decode().split('=', 1)[1].replace(' ', '')
+            hwid = serial[1:-2]
+            return hwid
 
-        sid = win32security.LookupAccountName(None, winuser)[0]
-        sidstr = win32security.ConvertSidToStringSid(sid)
-
-        return sidstr
 
 
 class encryption:
