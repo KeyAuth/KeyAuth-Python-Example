@@ -15,7 +15,7 @@ For API, `keyauth.cc` will not work because I purposefully blocked it on there s
 
 Visit and select your application, then click on the **Python** tab
 
-It'll provide you with the code which you should replace with in the `Program.cs` file (or `Login.cs` file if using Form example)
+It'll provide you with the code which you should replace with in the `main.py`.
 
 ```PY
 keyauthapp = api(
