@@ -15,7 +15,7 @@ For API, `keyauth.cc` will not work because I purposefully blocked it on there s
 
 Visit and select your application, then click on the **Python** tab
 
-It'll provide you with the code which you should replace with in the `main.py`.
+It'll provide you with the code which you should replace with in the `main.py` file.
 
 ```PY
 keyauthapp = api(
