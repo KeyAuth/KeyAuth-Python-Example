@@ -57,9 +57,9 @@ print(f"Current Session Validation Status: {keyauthapp.check()}")
 Check if HWID or IP Address is blacklisted. You can add this if you want, just to make sure nobody can open your program for less than a second if they're blacklisted. Though, if you don't mind a blacklisted user having the program for a few seconds until they try to login and register, and you care about having the quickest program for your users, you shouldn't use this function then. If a blacklisted user tries to login/register, the KeyAuth server will check if they're blacklisted and deny entry if so. So the check blacklist function is just auxiliary function that's optional.
 
 ```py
-if(keyauthapp.checkblacklist()) {
+if keyauthapp.checkblacklist():
+    print("You've been blacklisted from our application.")
     os._exit(1)
-}
 ```
 
 **Login with username/password**
@@ -184,7 +184,7 @@ Ban the user and blacklist their HWID and IP Address. Good function to call upon
 Function only works after login.
 
 ```py
-keyauthapp.ban();
+keyauthapp.ban()
 ```
 
 **Server-sided webhooks**
