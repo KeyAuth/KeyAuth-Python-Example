@@ -13,6 +13,10 @@ from datetime import datetime
 
 # watch setup video if you need help https://www.youtube.com/watch?v=L2eAQOmuUiA
 
+if sys.version_info.minor < 10:  # Python version check (Bypass Patch)
+    print("[Security] - Python 3.10 or higher is recommended. The bypass will not work on 3.10+")
+    print("You are using Python {}.{}".format(sys.version_info.major, sys.version_info.minor))
+
 if platform.system() == 'Windows':
     os.system('cls & title Python Example')  # clear console, change title
 elif platform.system() == 'Linux':
