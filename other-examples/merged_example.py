@@ -1,3 +1,5 @@
+# 1 file version
+
 import binascii  # hex encoding
 import hashlib
 import json as jsond  # json
