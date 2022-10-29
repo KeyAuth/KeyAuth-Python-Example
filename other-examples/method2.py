@@ -651,9 +651,9 @@ def getchecksum():
 
 
 keyauthapp = api(
-    name = "Teszt APP",
-    ownerid = "gAoE07oIAC",
-    secret = "ace6246e3879e947aa323e3464d5fb75aa6c40cce3bb4d03d2c722ec60b138f8",
+    name = "", #App name (Manage Applications --> Application name)
+    ownerid = "", #Owner ID (Account-Settings --> OwnerID)
+    secret = "", #App secret(Manage Applications --> App credentials code)
     version = "1.0",
     hash_to_check = getchecksum()
 )
