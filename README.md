@@ -247,3 +247,17 @@ Example on how to send chat message.
 * Send chat message
 keyauthapp.chatSend("MESSAGE", "CHANNEL")
 ```
+
+**How to compile?**
+
+You can either use Pyinstaller or Nuitka.
+
+Links:
+- Nutika: https://nuitka.net/
+- Pyinstaller: https://pyinstaller.org/
+
+Pyinstaller:
+- Basic command: `pyinstaller --onefile main.py`
+
+Nutika:
+- Basic command: `python -m nuitka --follow-imports --onefile main.py`
