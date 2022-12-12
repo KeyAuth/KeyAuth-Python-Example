@@ -64,7 +64,7 @@ class api:
         self.enckey = SHA256.new(str(uuid4())[:8].encode()).hexdigest()
 
         post_data = {
-            "type": binascii.hexlify(("init").encode()),
+            "type": binascii.hexlify("init".encode()),
             "ver": encryption.encrypt(self.version, self.secret, init_iv),
             "hash": self.hash_to_check,
             "enckey": encryption.encrypt(self.enckey, self.secret, init_iv),
@@ -108,7 +108,7 @@ class api:
         init_iv = SHA256.new(str(uuid4())[:8].encode()).hexdigest()
 
         post_data = {
-            "type": binascii.hexlify(("register").encode()),
+            "type": binascii.hexlify("register".encode()),
             "username": encryption.encrypt(user, self.enckey, init_iv),
             "pass": encryption.encrypt(password, self.enckey, init_iv),
             "key": encryption.encrypt(license, self.enckey, init_iv),
@@ -135,7 +135,7 @@ class api:
         init_iv = SHA256.new(str(uuid4())[:8].encode()).hexdigest()
 
         post_data = {
-            "type": binascii.hexlify(("upgrade").encode()),
+            "type": binascii.hexlify("upgrade".encode()),
             "username": encryption.encrypt(user, self.enckey, init_iv),
             "key": encryption.encrypt(license, self.enckey, init_iv),
             "sessionid": binascii.hexlify(self.sessionid.encode()),
@@ -167,7 +167,7 @@ class api:
         init_iv = SHA256.new(str(uuid4())[:8].encode()).hexdigest()
 
         post_data = {
-            "type": binascii.hexlify(("login").encode()),
+            "type": binascii.hexlify("login".encode()),
             "username": encryption.encrypt(user, self.enckey, init_iv),
             "pass": encryption.encrypt(password, self.enckey, init_iv),
             "hwid": encryption.encrypt(hwid, self.enckey, init_iv),
@@ -198,7 +198,7 @@ class api:
         init_iv = SHA256.new(str(uuid4())[:8].encode()).hexdigest()
 
         post_data = {
-            "type": binascii.hexlify(("license").encode()),
+            "type": binascii.hexlify("license".encode()),
             "key": encryption.encrypt(key, self.enckey, init_iv),
             "hwid": encryption.encrypt(hwid, self.enckey, init_iv),
             "sessionid": binascii.hexlify(self.sessionid.encode()),
@@ -224,7 +224,7 @@ class api:
         init_iv = SHA256.new(str(uuid4())[:8].encode()).hexdigest()
 
         post_data = {
-            "type": binascii.hexlify(("var").encode()),
+            "type": binascii.hexlify("var".encode()),
             "varid": encryption.encrypt(name, self.enckey, init_iv),
             "sessionid": binascii.hexlify(self.sessionid.encode()),
             "name": binascii.hexlify(self.name.encode()),
@@ -250,7 +250,7 @@ class api:
         init_iv = SHA256.new(str(uuid4())[:8].encode()).hexdigest()
 
         post_data = {
-            "type": binascii.hexlify(("getvar").encode()),
+            "type": binascii.hexlify("getvar".encode()),
             "var": encryption.encrypt(var_name, self.enckey, init_iv),
             "sessionid": binascii.hexlify(self.sessionid.encode()),
             "name": binascii.hexlify(self.name.encode()),
@@ -272,7 +272,7 @@ class api:
         self.checkinit()
         init_iv = SHA256.new(str(uuid4())[:8].encode()).hexdigest()
         post_data = {
-            "type": binascii.hexlify(("setvar").encode()),
+            "type": binascii.hexlify("setvar".encode()),
             "var": encryption.encrypt(var_name, self.enckey, init_iv),
             "data": encryption.encrypt(var_data, self.enckey, init_iv),
             "sessionid": binascii.hexlify(self.sessionid.encode()),
@@ -295,7 +295,7 @@ class api:
         self.checkinit()
         init_iv = SHA256.new(str(uuid4())[:8].encode()).hexdigest()
         post_data = {
-            "type": binascii.hexlify(("ban").encode()),
+            "type": binascii.hexlify("ban".encode()),
             "sessionid": binascii.hexlify(self.sessionid.encode()),
             "name": binascii.hexlify(self.name.encode()),
             "ownerid": binascii.hexlify(self.ownerid.encode()),
@@ -317,7 +317,7 @@ class api:
         init_iv = SHA256.new(str(uuid4())[:8].encode()).hexdigest()
 
         post_data = {
-            "type": binascii.hexlify(("file").encode()),
+            "type": binascii.hexlify("file".encode()),
             "fileid": encryption.encrypt(fileid, self.enckey, init_iv),
             "sessionid": binascii.hexlify(self.sessionid.encode()),
             "name": binascii.hexlify(self.name.encode()),
@@ -342,7 +342,7 @@ class api:
         init_iv = SHA256.new(str(uuid4())[:8].encode()).hexdigest()
 
         post_data = {
-            "type": binascii.hexlify(("webhook").encode()),
+            "type": binascii.hexlify("webhook".encode()),
             "webid": encryption.encrypt(webid, self.enckey, init_iv),
             "params": encryption.encrypt(param, self.enckey, init_iv),
             "body": encryption.encrypt(body, self.enckey, init_iv),
@@ -369,7 +369,7 @@ class api:
         self.checkinit()
         init_iv = SHA256.new(str(uuid4())[:8].encode()).hexdigest()
         post_data = {
-            "type": binascii.hexlify(("check").encode()),
+            "type": binascii.hexlify("check".encode()),
             "sessionid": binascii.hexlify(self.sessionid.encode()),
             "name": binascii.hexlify(self.name.encode()),
             "ownerid": binascii.hexlify(self.ownerid.encode()),
@@ -389,7 +389,7 @@ class api:
         hwid = others.get_hwid()
         init_iv = SHA256.new(str(uuid4())[:8].encode()).hexdigest()
         post_data = {
-            "type": binascii.hexlify(("checkblacklist").encode()),
+            "type": binascii.hexlify("checkblacklist".encode()),
             "hwid": encryption.encrypt(hwid, self.enckey, init_iv),
             "sessionid": binascii.hexlify(self.sessionid.encode()),
             "name": binascii.hexlify(self.name.encode()),
@@ -410,7 +410,7 @@ class api:
         init_iv = SHA256.new(str(uuid4())[:8].encode()).hexdigest()
 
         post_data = {
-            "type": binascii.hexlify(("log").encode()),
+            "type": binascii.hexlify("log".encode()),
             "pcuser": encryption.encrypt(os.getenv('username'), self.enckey, init_iv),
             "message": encryption.encrypt(message, self.enckey, init_iv),
             "sessionid": binascii.hexlify(self.sessionid.encode()),
@@ -426,7 +426,7 @@ class api:
         init_iv = SHA256.new(str(uuid4())[:8].encode()).hexdigest()
 
         post_data = {
-            "type": binascii.hexlify(("fetchOnline").encode()),
+            "type": binascii.hexlify("fetchOnline".encode()),
             "sessionid": binascii.hexlify(self.sessionid.encode()),
             "name": binascii.hexlify(self.name.encode()),
             "ownerid": binascii.hexlify(self.ownerid.encode()),
@@ -451,7 +451,7 @@ class api:
         init_iv = SHA256.new(str(uuid4())[:8].encode()).hexdigest()
 
         post_data = {
-            "type": binascii.hexlify(("chatget").encode()),
+            "type": binascii.hexlify("chatget".encode()),
             "channel": encryption.encrypt(channel, self.enckey, init_iv),
             "sessionid": binascii.hexlify(self.sessionid.encode()),
             "name": binascii.hexlify(self.name.encode()),
@@ -474,7 +474,7 @@ class api:
         init_iv = SHA256.new(str(uuid4())[:8].encode()).hexdigest()
 
         post_data = {
-            "type": binascii.hexlify(("chatsend").encode()),
+            "type": binascii.hexlify("chatsend".encode()),
             "message": encryption.encrypt(message, self.enckey, init_iv),
             "channel": encryption.encrypt(channel, self.enckey, init_iv),
             "sessionid": binascii.hexlify(self.sessionid.encode()),
@@ -545,7 +545,7 @@ class others:
                 return hwid
         elif platform.system() == 'Windows':
             winuser = os.getlogin()
-            sid = win32security.LookupAccountName(None, winuser)[0]
+            sid = win32security.LookupAccountName(None, winuser)[0]  # You can also use WMIC (better than SID, some users had problems with WMIC)
             hwid = win32security.ConvertSidToStringSid(sid)
             return hwid
         elif platform.system() == 'Darwin':
