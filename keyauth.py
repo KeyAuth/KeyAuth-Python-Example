@@ -510,8 +510,7 @@ class api:
 
     class application_data_class:
         numUsers = numKeys = app_ver = customer_panel = onlineUsers = ""
-    # region user_data
-
+        
     class user_data_class:
         username = ip = hwid = expires = createdate = lastlogin = subscription = subscriptions = ""
 
