@@ -1,5 +1,5 @@
 # KeyAuth-Python-Example
-KeyAuth Python Example For The https://keyauth.cc Authentication system.
+KeyAuth Python example for the https://keyauth.cc authentication system.
 
 ## **Bugs**
 
@@ -51,7 +51,7 @@ Nutika:
 
 ## **`KeyAuthApp` instance definition**
 
-Visit and select your application, then click on the **Python** tab
+Visit https://keyauth.cc/app/ and select your application, then click on the **Python** tab
 
 It'll provide you with the code which you should replace with in the `main.py` file.
 
@@ -206,7 +206,7 @@ print(data)
 
 ## **Application Logs**
 
-Can be used to log data. Good for anti-debug alerts and maybe error debugging. If you set Discord webhook in the app settings of the Dashboard, it will send log messages to your Discord webhook rather than store them on site. It's recommended that you set Discord webhook, as logs on site may be deleted after a couple months of their creation.
+Can be used to log data. Good for anti-debug alerts and maybe error debugging. If you set Discord webhook in the app settings of the Dashboard, it will send log messages to your Discord webhook rather than store them on site. It's recommended that you set Discord webhook, as logs on site are deleted 1 month after being sent.
 
 You can use the log function before login & after login.
 
@@ -229,6 +229,9 @@ keyauthapp.ban()
 
 Tutorial video https://www.youtube.com/watch?v=ENRaNPPYJbc
 
+> **Note**
+> Read documentation for KeyAuth webhooks here https://docs.keyauth.cc/website/dashboard/webhooks
+
 Send HTTP requests to URLs securely without leaking the URL in your application. You should definitely use if you want to send requests to SellerAPI from your application, otherwise if you don't use you'll be leaking your seller key to everyone. And then someone can mess up your application.
 
 1st example is how to send request with no POST data. just a GET request to the URL. `7kR0UedlVI` is the webhook ID, `https://keyauth.win/api/seller/?sellerkey=sellerkeyhere&type=black` is what you should put as the webhook endpoint on the dashboard. This is the part you don't want users to see. And then you have `&ip=1.1.1.1&hwid=abc` in your program code which will be added to the webhook endpoint on the keyauth server and then the request will be sent.
@@ -249,6 +252,9 @@ data = keyauthapp.webhook("7kR0UedlVI", "", "{\"content\": \"webhook message her
 ```
 
 ## **Download file**
+
+> **Note**
+> Read documentation for KeyAuth files here https://docs.keyauth.cc/website/dashboard/files
 
 Keep files secure by providing KeyAuth your file download link on the KeyAuth dashboard. Make sure this is a direct download link (as soon as you go to the link, it starts downloading without you clicking anything). The KeyAuth download function provides the bytes, and then you get to decide what to do with those. This example shows how to write it to a file named `text.txt` in the same folder as the program, though you could execute with RunPE or whatever you want.
 
