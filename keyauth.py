@@ -499,6 +499,28 @@ class api:
             time.sleep(2)
             os._exit(1)
 
+    def changeUsername(self, username):
+        self.checkinit()
+        init_iv = SHA256.new(str(uuid4())[:8].encode()).hexdigest()
+        post_data = {
+            "type": binascii.hexlify("changeUsername".encode()),
+            "newUsername": username,
+            "sessionid": binascii.hexlify(self.sessionid.encode()),
+            "name": binascii.hexlify(self.name.encode()),
+            "ownerid": binascii.hexlify(self.ownerid.encode()),
+            "init_iv": init_iv
+        }
+
+        response = self.__do_request(post_data)
+        response = encryption.decrypt(response, self.enckey, init_iv)
+        json = jsond.loads(response)
+
+        if json["success"]:
+            print("successfully Changed Username")
+        else:
+            print(json["message"])
+            os._exit(1)        
+            
     def __do_request(self, post_data):
         try:
             rq_out = s.post(
