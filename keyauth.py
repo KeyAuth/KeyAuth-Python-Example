@@ -1,10 +1,5 @@
-import os
-import json as jsond  # json
-import time  # sleep before exit
-import binascii  # hex encoding
+import os, time, binascii, platform, subprocess, json as jsond
 from uuid import uuid4  # gen random guid
-import platform  # check platform
-import subprocess  # needed for mac device
 
 try:
     if os.name == 'nt':
@@ -14,51 +9,39 @@ try:
     from Crypto.Hash import SHA256
     from Crypto.Util.Padding import pad, unpad
 except ModuleNotFoundError:
-    print("Exception when importing modules")
-    print("Installing necessary modules....")
+    print("Exception when importing modules, Installing necessary modules....")
     if os.path.isfile("requirements.txt"):
         os.system("pip install -r requirements.txt")
     else:
-        os.system("pip install pywin32")
-        os.system("pip install pycryptodome")
-        os.system("pip install requests")
+        os.system("pip install pywin32; pip install pycryptodome; pip install requests")
     print("Modules installed!")
-    time.sleep(1.5)
-    os._exit(1)
+    exit(1)
 
 try:  # Connection check
-    s = requests.Session()  # Session
-    s.get('https://google.com')
+    requests.get('https://google.com')
 except requests.exceptions.RequestException as e:
     print(e)
-    time.sleep(3)
-    os._exit(1)
+    exit(1)
+
+msg_exit = lambda a: print(a)
 
 
 class api:
-
-    name = ownerid = secret = version = hash_to_check = ""
+    name: str
+    ownerid: str
+    secret: str
+    version: str
+    hash_to_check: str
+    sessionid: str
+    enckey: str
+    initialized: bool
 
     def __init__(self, name, ownerid, secret, version, hash_to_check):
-        self.name = name
+        self.name, self.ownerid, self.secret, self.version, self.hash_to_check = [name, ownerid, secret, version, hash_to_check]
 
-        self.ownerid = ownerid
-
-        self.secret = secret
-
-        self.version = version
-        self.hash_to_check = hash_to_check
-        self.init()
-
-    sessionid = enckey = ""
-    initialized = False
 
     def init(self):
-
-        if self.sessionid != "":
-            print("You've already initialized!")
-            time.sleep(2)
-            os._exit(1)
+        if self.sessionid != "": return print("You've already initialized!")
         init_iv = SHA256.new(str(uuid4())[:8].encode()).hexdigest()
 
         self.enckey = SHA256.new(str(uuid4())[:8].encode()).hexdigest()
@@ -77,7 +60,7 @@ class api:
 
         if response == "KeyAuth_Invalid":
             print("The application doesn't exist")
-            os._exit(1)
+            return
 
         response = encryption.decrypt(response, self.secret, init_iv)
         json = jsond.loads(response)
@@ -126,11 +109,12 @@ class api:
         if json["success"]:
             print("successfully registered")
             self.__load_user_data(json["info"])
-        else:
-            print(json["message"])
-            os._exit(1)
+            return
+        
+        print(json["message"])
+        os._exit(1)
 
-    def upgrade(self, user, license):
+    def upgrade(self, user: str, license: str) -> None:
         self.checkinit()
         init_iv = SHA256.new(str(uuid4())[:8].encode()).hexdigest()
 
@@ -145,24 +129,20 @@ class api:
         }
 
         response = self.__do_request(post_data)
-
         response = encryption.decrypt(response, self.enckey, init_iv)
-
         json = jsond.loads(response)
 
         if json["success"]:
             print("successfully upgraded user")
             print("please restart program and login")
-            time.sleep(2)
             os._exit(1)
-        else:
-            print(json["message"])
-            os._exit(1)
+            
+        print(json["message"])
+        os._exit(1)
 
-    def login(self, user, password, hwid=None):
+    def login(self, user, password: str, hwid=None):
         self.checkinit()
-        if hwid is None:
-            hwid = others.get_hwid()
+        if hwid is None: hwid = others.get_hwid()
 
         init_iv = SHA256.new(str(uuid4())[:8].encode()).hexdigest()
 
@@ -178,22 +158,20 @@ class api:
         }
 
         response = self.__do_request(post_data)
-
         response = encryption.decrypt(response, self.enckey, init_iv)
-
         json = jsond.loads(response)
 
         if json["success"]:
             self.__load_user_data(json["info"])
             print("successfully logged in")
-        else:
-            print(json["message"])
-            os._exit(1)
+            return
 
-    def license(self, key, hwid=None):
+        print(json["message"])
+        os._exit(1)
+
+    def license(self, key: str, hwid=None) -> None:
         self.checkinit()
-        if hwid is None:
-            hwid = others.get_hwid()
+        if hwid is None: hwid = others.get_hwid()
 
         init_iv = SHA256.new(str(uuid4())[:8].encode()).hexdigest()
 
@@ -215,11 +193,12 @@ class api:
         if json["success"]:
             self.__load_user_data(json["info"])
             print("successfully logged into license")
-        else:
-            print(json["message"])
-            os._exit(1)
+            return
+            
+        print(json["message"])
+        os._exit(1)
 
-    def var(self, name):
+    def var(self, name: str) -> str:
         self.checkinit()
         init_iv = SHA256.new(str(uuid4())[:8].encode()).hexdigest()
 
@@ -233,19 +212,17 @@ class api:
         }
 
         response = self.__do_request(post_data)
-
         response = encryption.decrypt(response, self.enckey, init_iv)
-
         json = jsond.loads(response)
 
         if json["success"]:
             return json["message"]
-        else:
-            print(json["message"])
-            time.sleep(5)
-            os._exit(1)
+        
+        print(json["message"])
+        time.sleep(5)
+        os._exit(1)
 
-    def getvar(self, var_name):
+    def getvar(self, var_name: str) -> str:
         self.checkinit()
         init_iv = SHA256.new(str(uuid4())[:8].encode()).hexdigest()
 
@@ -263,14 +240,15 @@ class api:
 
         if json["success"]:
             return json["response"]
-        else:
-            print(json["message"])
-            time.sleep(5)
-            os._exit(1)
+            
+        print(json["message"])
+        os._exit(1)
 
-    def setvar(self, var_name, var_data):
+    def setvar(self, var_name: str, var_data: str) -> bool:
         self.checkinit()
+
         init_iv = SHA256.new(str(uuid4())[:8].encode()).hexdigest()
+
         post_data = {
             "type": binascii.hexlify("setvar".encode()),
             "var": encryption.encrypt(var_name, self.enckey, init_iv),
@@ -286,14 +264,16 @@ class api:
 
         if json["success"]:
             return True
-        else:
-            print(json["message"])
-            time.sleep(5)
-            os._exit(1)
+            
+        print(json["message"])
+        time.sleep(5)
+        os._exit(1)
 
-    def ban(self):
+    def ban(self) -> bool:
         self.checkinit()
+
         init_iv = SHA256.new(str(uuid4())[:8].encode()).hexdigest()
+
         post_data = {
             "type": binascii.hexlify("ban".encode()),
             "sessionid": binascii.hexlify(self.sessionid.encode()),
@@ -301,18 +281,19 @@ class api:
             "ownerid": binascii.hexlify(self.ownerid.encode()),
             "init_iv": init_iv
         }
+
         response = self.__do_request(post_data)
         response = encryption.decrypt(response, self.enckey, init_iv)
         json = jsond.loads(response)
 
         if json["success"]:
             return True
-        else:
-            print(json["message"])
-            time.sleep(5)
-            os._exit(1)
 
-    def file(self, fileid):
+        print(json["message"])
+        time.sleep(5)
+        os._exit(1)
+
+    def file(self, fileid: str) -> str:
         self.checkinit()
         init_iv = SHA256.new(str(uuid4())[:8].encode()).hexdigest()
 
@@ -333,11 +314,11 @@ class api:
 
         if not json["success"]:
             print(json["message"])
-            time.sleep(5)
-            os._exit(1)
+            exit(1)
+
         return binascii.unhexlify(json["contents"])
 
-    def webhook(self, webid, param, body = "", conttype = ""):
+    def webhook(self, webid: str, param: str, body = "", conttype = "") -> str:
         self.checkinit()
         init_iv = SHA256.new(str(uuid4())[:8].encode()).hexdigest()
 
@@ -360,12 +341,11 @@ class api:
 
         if json["success"]:
             return json["message"]
-        else:
-            print(json["message"])
-            time.sleep(5)
-            os._exit(1)
+            
+        print(json["message"])
+        exit(1)
 
-    def check(self):
+    def check(self) -> bool:
         self.checkinit()
         init_iv = SHA256.new(str(uuid4())[:8].encode()).hexdigest()
         post_data = {
@@ -381,10 +361,10 @@ class api:
         json = jsond.loads(response)
         if json["success"]:
             return True
-        else:
-            return False
+            
+        return False
 
-    def checkblacklist(self):
+    def checkblacklist(self) -> bool:
         self.checkinit()
         hwid = others.get_hwid()
         init_iv = SHA256.new(str(uuid4())[:8].encode()).hexdigest()
@@ -402,10 +382,10 @@ class api:
         json = jsond.loads(response)
         if json["success"]:
             return True
-        else:
-            return False
+            
+        return False
 
-    def log(self, message):
+    def log(self, message: str) -> None:
         self.checkinit()
         init_iv = SHA256.new(str(uuid4())[:8].encode()).hexdigest()
 
@@ -439,14 +419,11 @@ class api:
         json = jsond.loads(response)
 
         if json["success"]:
-            if len(json["users"]) == 0:
-                return None  # THIS IS ISSUE ON KEYAUTH SERVER SIDE 6.8.2022, so it will return none if it is not an array.
-            else:
-                return json["users"]
-        else:
-            return None
+            if len(json["users"]) != 0: return json["users"]
 
-    def chatGet(self, channel):
+        return None
+
+    def chatGet(self, channel: str) -> str|None:
         self.checkinit()
         init_iv = SHA256.new(str(uuid4())[:8].encode()).hexdigest()
 
@@ -464,12 +441,11 @@ class api:
 
         json = jsond.loads(response)
 
-        if json["success"]:
-            return json["messages"]
-        else:
-            return None
+        if json["success"]: return json["messages"]
+        
+        return None
 
-    def chatSend(self, message, channel):
+    def chatSend(self, message: str, channel: str) -> bool:
         self.checkinit()
         init_iv = SHA256.new(str(uuid4())[:8].encode()).hexdigest()
 
@@ -490,16 +466,15 @@ class api:
 
         if json["success"]:
             return True
-        else:
-            return False
+            
+        return False
 
     def checkinit(self):
         if not self.initialized:
             print("Initialize first, in order to use the functions")
-            time.sleep(2)
-            os._exit(1)
+            exit(0)
 
-    def changeUsername(self, username):
+    def changeUsername(self, username: str) -> None:
         self.checkinit()
         init_iv = SHA256.new(str(uuid4())[:8].encode()).hexdigest()
         post_data = {
@@ -517,25 +492,35 @@ class api:
 
         if json["success"]:
             print("successfully Changed Username")
-        else:
-            print(json["message"])
-            os._exit(1)        
+        
+        print(json["message"])
+        exitt(0)        
             
-    def __do_request(self, post_data):
+    def __do_request(self, post_data) -> str:
         try:
-            rq_out = s.post(
-                "https://keyauth.win/api/1.0/", data=post_data, timeout=30
-            )
+            rq_out = s.post("https://keyauth.win/api/1.0/", data=post_data, timeout=30)
             return rq_out.text
         except requests.exceptions.Timeout:
             print("Request timed out")
+            return ""
 
     class application_data_class:
-        numUsers = numKeys = app_ver = customer_panel = onlineUsers = ""
+        numUsers: str
+        numKeys: str
+        app_ver: str
+        customer_panel: str
+        onlineUsers: str
     # region user_data
 
     class user_data_class:
-        username = ip = hwid = expires = createdate = lastlogin = subscription = subscriptions = ""
+        username: str
+        ip: str
+        hwid: str
+        expires: str
+        createdate: str
+        lastlogin: str
+        subscription: str
+        subscriptions: str
 
     user_data = user_data_class()
     app_data = application_data_class()
@@ -580,7 +565,7 @@ class others:
 
 class encryption:
     @staticmethod
-    def encrypt_string(plain_text, key, iv):
+    def encrypt_string(plain_text: str, key: str, iv: str) -> str:
         plain_text = pad(plain_text, 16)
 
         aes_instance = AES.new(key, AES.MODE_CBC, iv)
@@ -590,7 +575,7 @@ class encryption:
         return binascii.hexlify(raw_out)
 
     @staticmethod
-    def decrypt_string(cipher_text, key, iv):
+    def decrypt_string(cipher_text: str, key: str, iv: str) -> str:
         cipher_text = binascii.unhexlify(cipher_text)
 
         aes_instance = AES.new(key, AES.MODE_CBC, iv)
@@ -600,7 +585,7 @@ class encryption:
         return unpad(cipher_text, 16)
 
     @staticmethod
-    def encrypt(message, enc_key, iv):
+    def encrypt(message: str, enc_key: str, iv: str) -> str:
         try:
             _key = SHA256.new(enc_key.encode()).hexdigest()[:32]
 
@@ -612,7 +597,7 @@ class encryption:
             os._exit(1)
 
     @staticmethod
-    def decrypt(message, enc_key, iv):
+    def decrypt(message: str, enc_key: str, iv: str) -> str:
         try:
             _key = SHA256.new(enc_key.encode()).hexdigest()[:32]
 
