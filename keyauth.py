@@ -2,31 +2,28 @@ import os, time, binascii, platform, subprocess, json as jsond
 from uuid import uuid4  # gen random guid
 
 try:
-    if os.name == 'nt':
-        import win32security  # get sid (WIN only)
+    if os.name == 'nt': import win32security  # get sid (WIN only)
     import requests  # https requests
     from Crypto.Cipher import AES
     from Crypto.Hash import SHA256
     from Crypto.Util.Padding import pad, unpad
 except ModuleNotFoundError:
     print("Exception when importing modules, Installing necessary modules....")
+    
     if os.path.isfile("requirements.txt"):
+        print("[+] Unable to find requirements file, Installing modules manually....")
         os.system("pip install -r requirements.txt")
-    else:
-        os.system("pip install pywin32; pip install pycryptodome; pip install requests")
-    print("Modules installed!")
-    exit(1)
+        sys.exit("Modules installed!")
+
+    os.system("pip install pywin32; pip install pycryptodome; pip install requests")
+    sys.exit("Modules installed!")
 
 try:  # Connection check
     requests.get('https://google.com')
-except requests.exceptions.RequestException as e:
-    print(e)
-    exit(1)
+except:
+    sys.exit("[!] You have no internet connectivity....")
 
-msg_exit = lambda a: print(a)
-
-
-class api:
+class KeyAuth:
     name: str
     ownerid: str
     secret: str
@@ -72,12 +69,9 @@ class api:
                 os.system(f"start {download_link}")
                 os._exit(1)
             else:
-                print("Invalid Version, Contact owner to add download link to latest app version")
-                os._exit(1)
+                sys.exit("Invalid Version, Contact owner to add download link to latest app version")
 
-        if not json["success"]:
-            print(json["message"])
-            os._exit(1)
+        if not json["success"]: sys.exit(json["message"])
 
         self.sessionid = json["sessionid"]
         self.initialized = True
@@ -111,8 +105,7 @@ class api:
             self.__load_user_data(json["info"])
             return
         
-        print(json["message"])
-        os._exit(1)
+        sys.exit(json["message"])
 
     def upgrade(self, user: str, license: str) -> None:
         self.checkinit()
@@ -133,12 +126,9 @@ class api:
         json = jsond.loads(response)
 
         if json["success"]:
-            print("successfully upgraded user")
-            print("please restart program and login")
-            os._exit(1)
+            sys.exit("successfully upgraded user, please restart program and login")
             
-        print(json["message"])
-        os._exit(1)
+        sys.exit(json["message"])
 
     def login(self, user, password: str, hwid=None):
         self.checkinit()
@@ -166,8 +156,7 @@ class api:
             print("successfully logged in")
             return
 
-        print(json["message"])
-        os._exit(1)
+        sys.exit(json["message"])
 
     def license(self, key: str, hwid=None) -> None:
         self.checkinit()
@@ -195,8 +184,7 @@ class api:
             print("successfully logged into license")
             return
             
-        print(json["message"])
-        os._exit(1)
+        sys.exit(json["message"])
 
     def var(self, name: str) -> str:
         self.checkinit()
@@ -218,9 +206,7 @@ class api:
         if json["success"]:
             return json["message"]
         
-        print(json["message"])
-        time.sleep(5)
-        os._exit(1)
+        sys.exit(json["message"])
 
     def getvar(self, var_name: str) -> str:
         self.checkinit()
@@ -241,8 +227,7 @@ class api:
         if json["success"]:
             return json["response"]
             
-        print(json["message"])
-        os._exit(1)
+        sys.exit(json["message"])
 
     def setvar(self, var_name: str, var_data: str) -> bool:
         self.checkinit()
@@ -265,9 +250,7 @@ class api:
         if json["success"]:
             return True
             
-        print(json["message"])
-        time.sleep(5)
-        os._exit(1)
+        sys.exit(json["message"])
 
     def ban(self) -> bool:
         self.checkinit()
@@ -289,9 +272,7 @@ class api:
         if json["success"]:
             return True
 
-        print(json["message"])
-        time.sleep(5)
-        os._exit(1)
+        sys.exit(json["message"])
 
     def file(self, fileid: str) -> str:
         self.checkinit()
@@ -313,8 +294,7 @@ class api:
         json = jsond.loads(response)
 
         if not json["success"]:
-            print(json["message"])
-            exit(1)
+            sys.exit(json["message"])
 
         return binascii.unhexlify(json["contents"])
 
@@ -342,8 +322,7 @@ class api:
         if json["success"]:
             return json["message"]
             
-        print(json["message"])
-        exit(1)
+        sys.exit(json["message"])
 
     def check(self) -> bool:
         self.checkinit()
@@ -493,8 +472,7 @@ class api:
         if json["success"]:
             print("successfully Changed Username")
         
-        print(json["message"])
-        exitt(0)        
+        sys.exit(json["message"])
             
     def __do_request(self, post_data) -> str:
         try:
@@ -605,5 +583,4 @@ class encryption:
 
             return encryption.decrypt_string(message.encode(), _key.encode(), _iv.encode()).decode()
         except:
-            print("Invalid Application Information. Long text is secret short text is ownerid. Name is supposed to be app name not username")
-            os._exit(1)
+            sys.exit("Invalid Application Information. Long text is secret short text is ownerid. Name is supposed to be app name not username")
