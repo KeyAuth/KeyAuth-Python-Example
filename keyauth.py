@@ -264,6 +264,7 @@ class api:
         if json["success"]:
             return json["response"]
         else:
+            print(f"NOTE: This is commonly misunderstood. This is for user variables, not the normal variables.\nUse keyauthapp.var(\"{var_name}\") for normal variables");
             print(json["message"])
             time.sleep(5)
             os._exit(1)
