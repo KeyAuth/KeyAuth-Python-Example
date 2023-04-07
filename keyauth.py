@@ -31,7 +31,7 @@ try:  # Connection check
     s.get('https://google.com')
 except requests.exceptions.RequestException as e:
     print(e)
-    time.sleep(3)
+    time.sleep(5)
     os._exit(1)
 
 
@@ -87,6 +87,7 @@ class api:
                 print("New Version Available")
                 download_link = json["download"]
                 os.system(f"start {download_link}")
+                time.sleep(3)
                 os._exit(1)
             else:
                 print("Invalid Version, Contact owner to add download link to latest app version")
@@ -94,6 +95,7 @@ class api:
 
         if not json["success"]:
             print(json["message"])
+            time.sleep(3)
             os._exit(1)
 
         self.sessionid = json["sessionid"]
@@ -128,6 +130,7 @@ class api:
             self.__load_user_data(json["info"])
         else:
             print(json["message"])
+            time.sleep(5)
             os._exit(1)
 
     def upgrade(self, user, license):
@@ -157,6 +160,7 @@ class api:
             os._exit(1)
         else:
             print(json["message"])
+            time.sleep(5)
             os._exit(1)
 
     def login(self, user, password, hwid=None):
@@ -188,6 +192,7 @@ class api:
             print("successfully logged in")
         else:
             print(json["message"])
+            time.sleep(5)
             os._exit(1)
 
     def license(self, key, hwid=None):
@@ -217,6 +222,7 @@ class api:
             print("successfully logged into license")
         else:
             print(json["message"])
+            time.sleep(5)
             os._exit(1)
 
     def var(self, name):
@@ -610,6 +616,7 @@ class encryption:
             return encryption.encrypt_string(message.encode(), _key.encode(), _iv.encode()).decode()
         except:
             print("Invalid Application Information. Long text is secret short text is ownerid. Name is supposed to be app name not username")
+            time.sleep(5)
             os._exit(1)
 
     @staticmethod
@@ -622,4 +629,5 @@ class encryption:
             return encryption.decrypt_string(message.encode(), _key.encode(), _iv.encode()).decode()
         except:
             print("Invalid Application Information. Long text is secret short text is ownerid. Name is supposed to be app name not username")
+            time.sleep(5)
             os._exit(1)
