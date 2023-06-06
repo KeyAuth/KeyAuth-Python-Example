@@ -77,6 +77,7 @@ class api:
 
         if response == "KeyAuth_Invalid":
             print("The application doesn't exist")
+            time.sleep(5)
             os._exit(1)
 
         response = encryption.decrypt(response, self.secret, init_iv)
@@ -91,6 +92,7 @@ class api:
                 os._exit(1)
             else:
                 print("Invalid Version, Contact owner to add download link to latest app version")
+                time.sleep(5)
                 os._exit(1)
 
         if not json["success"]:
@@ -526,6 +528,7 @@ class api:
             print("successfully Changed Username")
         else:
             print(json["message"])
+            time.sleep(5)
             os._exit(1)        
             
     def __do_request(self, post_data):
