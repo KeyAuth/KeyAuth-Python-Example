@@ -31,7 +31,7 @@ try:  # Connection check
     s.get('https://google.com')
 except requests.exceptions.RequestException as e:
     print(e)
-    time.sleep(5)
+    time.sleep(3)
     os._exit(1)
 
 
@@ -57,7 +57,7 @@ class api:
 
         if self.sessionid != "":
             print("You've already initialized!")
-            time.sleep(2)
+            time.sleep(3)
             os._exit(1)
         init_iv = SHA256.new(str(uuid4())[:8].encode()).hexdigest()
 
@@ -77,7 +77,7 @@ class api:
 
         if response == "KeyAuth_Invalid":
             print("The application doesn't exist")
-            time.sleep(5)
+            time.sleep(3)
             os._exit(1)
 
         response = encryption.decrypt(response, self.secret, init_iv)
@@ -92,7 +92,7 @@ class api:
                 os._exit(1)
             else:
                 print("Invalid Version, Contact owner to add download link to latest app version")
-                time.sleep(5)
+                time.sleep(3)
                 os._exit(1)
 
         if not json["success"]:
@@ -132,7 +132,7 @@ class api:
             self.__load_user_data(json["info"])
         else:
             print(json["message"])
-            time.sleep(5)
+            time.sleep(3)
             os._exit(1)
 
     def upgrade(self, user, license):
@@ -156,13 +156,13 @@ class api:
         json = jsond.loads(response)
 
         if json["success"]:
-            print("successfully upgraded user")
-            print("please restart program and login")
-            time.sleep(2)
+            print("Successfully upgraded user")
+            print("Please restart program and login")
+            time.sleep(3)
             os._exit(1)
         else:
             print(json["message"])
-            time.sleep(5)
+            time.sleep(3)
             os._exit(1)
 
     def login(self, user, password, hwid=None):
@@ -191,10 +191,10 @@ class api:
 
         if json["success"]:
             self.__load_user_data(json["info"])
-            print("successfully logged in")
+            print("Successfully logged in")
         else:
             print(json["message"])
-            time.sleep(5)
+            time.sleep(3)
             os._exit(1)
 
     def license(self, key, hwid=None):
@@ -221,10 +221,10 @@ class api:
 
         if json["success"]:
             self.__load_user_data(json["info"])
-            print("successfully logged into license")
+            print("Successfully logged in with license")
         else:
             print(json["message"])
-            time.sleep(5)
+            time.sleep(3)
             os._exit(1)
 
     def var(self, name):
@@ -250,7 +250,7 @@ class api:
             return json["message"]
         else:
             print(json["message"])
-            time.sleep(5)
+            time.sleep(3)
             os._exit(1)
 
     def getvar(self, var_name):
@@ -274,7 +274,7 @@ class api:
         else:
             print(f"NOTE: This is commonly misunderstood. This is for user variables, not the normal variables.\nUse keyauthapp.var(\"{var_name}\") for normal variables");
             print(json["message"])
-            time.sleep(5)
+            time.sleep(3)
             os._exit(1)
 
     def setvar(self, var_name, var_data):
@@ -297,7 +297,7 @@ class api:
             return True
         else:
             print(json["message"])
-            time.sleep(5)
+            time.sleep(3)
             os._exit(1)
 
     def ban(self):
@@ -318,7 +318,7 @@ class api:
             return True
         else:
             print(json["message"])
-            time.sleep(5)
+            time.sleep(3)
             os._exit(1)
 
     def file(self, fileid):
@@ -342,7 +342,7 @@ class api:
 
         if not json["success"]:
             print(json["message"])
-            time.sleep(5)
+            time.sleep(3)
             os._exit(1)
         return binascii.unhexlify(json["contents"])
 
@@ -371,7 +371,7 @@ class api:
             return json["message"]
         else:
             print(json["message"])
-            time.sleep(5)
+            time.sleep(3)
             os._exit(1)
 
     def check(self):
@@ -505,7 +505,7 @@ class api:
     def checkinit(self):
         if not self.initialized:
             print("Initialize first, in order to use the functions")
-            time.sleep(2)
+            time.sleep(3)
             os._exit(1)
 
     def changeUsername(self, username):
@@ -525,10 +525,10 @@ class api:
         json = jsond.loads(response)
 
         if json["success"]:
-            print("successfully Changed Username")
+            print("Successfully changed username")
         else:
             print(json["message"])
-            time.sleep(5)
+            time.sleep(3)
             os._exit(1)        
             
     def __do_request(self, post_data):
@@ -560,7 +560,7 @@ class api:
     def __load_user_data(self, data):
         self.user_data.username = data["username"]
         self.user_data.ip = data["ip"]
-        self.user_data.hwid = data["hwid"]
+        self.user_data.hwid = data["hwid"] or "N/A"
         self.user_data.expires = data["subscriptions"][0]["expiry"]
         self.user_data.createdate = data["createdate"]
         self.user_data.lastlogin = data["lastlogin"]
@@ -618,8 +618,9 @@ class encryption:
 
             return encryption.encrypt_string(message.encode(), _key.encode(), _iv.encode()).decode()
         except:
-            print("Invalid Application Information. Long text is secret short text is ownerid. Name is supposed to be app name not username")
-            time.sleep(5)
+            print("Encryption error. Make sure your app details are correct, see response below")
+            print("Response: " + message)
+            time.sleep(3)
             os._exit(1)
 
     @staticmethod
@@ -631,6 +632,7 @@ class encryption:
 
             return encryption.decrypt_string(message.encode(), _key.encode(), _iv.encode()).decode()
         except:
-            print("Invalid Application Information. Long text is secret short text is ownerid. Name is supposed to be app name not username")
-            time.sleep(5)
+            print("Encryption error. Make sure your app details are correct, see response below")
+            print("Response: " + message)
+            time.sleep(3)
             os._exit(1)

@@ -1,3 +1,12 @@
+'''
+KeyAuth.cc Python Example
+
+Go to https://keyauth.cc/app/ and click the Python tab. Copy that code and replace the existing keyauthapp instance in this file.
+
+If you get an error saying it can't find module KeyAuth, try following this https://github.com/KeyAuth/KeyAuth-Python-Example#how-to-compile
+
+If that doesn't work for you, you can paste the contents of KeyAuth.py ABOVE this comment and then remove the "from keyauth import api" and that should work too.
+'''
 from keyauth import api
 
 import sys
@@ -13,18 +22,15 @@ from datetime import datetime
 
 # watch setup video if you need help https://www.youtube.com/watch?v=L2eAQOmuUiA
 
-if sys.version_info.minor < 10:  # Python version check (Bypass Patch)
-    print("[Security] - Python 3.10 or higher is recommended. The bypass will not work on 3.10+")
-    print("You are using Python {}.{}".format(sys.version_info.major, sys.version_info.minor))
-
-if platform.system() == 'Windows':
-    os.system('cls & title Python Example')  # clear console, change title
-elif platform.system() == 'Linux':
-    os.system('clear')  # clear console
-    sys.stdout.write("\x1b]0;Python Example\x07")  # change title
-elif platform.system() == 'Darwin':
-    os.system("clear && printf '\e[3J'")  # clear console
-    os.system('''echo - n - e "\033]0;Python Example\007"''')  # change title
+def clear():
+    if platform.system() == 'Windows':
+        os.system('cls & title Python Example')  # clear console, change title
+    elif platform.system() == 'Linux':
+        os.system('clear')  # clear console
+        sys.stdout.write("\x1b]0;Python Example\x07")  # change title
+    elif platform.system() == 'Darwin':
+        os.system("clear && printf '\e[3J'")  # clear console
+        os.system('''echo - n - e "\033]0;Python Example\007"''')  # change title
 
 print("Initializing")
 
@@ -56,7 +62,6 @@ Customer panel link: {keyauthapp.app_data.customer_panel}
 print(f"Current Session Validation Status: {keyauthapp.check()}")
 print(f"Blacklisted? : {keyauthapp.checkblacklist()}")  # check if blacklisted, you can edit this and make it exit the program if blacklisted
 
-
 def answer():
     try:
         print("""
@@ -83,9 +88,9 @@ def answer():
             key = input('Enter your license: ')
             keyauthapp.license(key)
         else:
-            print("\nNot Valid Option")
-            time.sleep(1)
-            os.system('cls')
+            print("\nInvalid option")
+            sleep(1)
+            clear()
             answer()
     except KeyboardInterrupt:
         os._exit(1)
