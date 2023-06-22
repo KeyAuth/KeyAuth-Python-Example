@@ -6,6 +6,8 @@ Go to https://keyauth.cc/app/ and click the Python tab. Copy that code and repla
 If you get an error saying it can't find module KeyAuth, try following this https://github.com/KeyAuth/KeyAuth-Python-Example#how-to-compile
 
 If that doesn't work for you, you can paste the contents of KeyAuth.py ABOVE this comment and then remove the "from keyauth import api" and that should work too.
+
+READ HERE TO LEARN ABOUT KEYAUTH FUNCTIONS https://github.com/KeyAuth/KeyAuth-Python-Example#keyauthapp-instance-definition
 '''
 from keyauth import api
 
@@ -59,13 +61,10 @@ Number of keys: {keyauthapp.app_data.numKeys}
 Application Version: {keyauthapp.app_data.app_ver}
 Customer panel link: {keyauthapp.app_data.customer_panel}
 """)
-print(f"Current Session Validation Status: {keyauthapp.check()}")
-print(f"Blacklisted? : {keyauthapp.checkblacklist()}")  # check if blacklisted, you can edit this and make it exit the program if blacklisted
 
 def answer():
     try:
-        print("""
-1.Login
+        print("""1.Login
 2.Register
 3.Upgrade
 4.License Key Only
@@ -97,65 +96,6 @@ def answer():
 
 
 answer()
-
-# region Extra Functions
-
-# * Download Files form the server to your computer using the download function in the api class
-# bytes = keyauthapp.file("FILEID")
-# f = open("example.exe", "wb")
-# f.write(bytes)
-# f.close()
-
-
-# * Set up user variable
-# keyauthapp.setvar("varName", "varValue")
-
-# * Get user variable and print it
-# data = keyauthapp.getvar("varName")
-# print(data)
-
-# * Get normal variable and print it
-# data = keyauthapp.var("varName")
-# print(data)
-
-# * Log message to the server and then to your webhook what is set on app settings
-# keyauthapp.log("Message")
-
-# * Get if the user pc have been blacklisted
-# print(f"Blacklisted? : {keyauthapp.checkblacklist()}")
-
-# * See if the current session is validated
-# print(f"Session Validated?: {keyauthapp.check()}")
-
-
-# * example to send normal request with no POST data
-# data = keyauthapp.webhook("WebhookID", "?type=resetuser&user=username")
-
-# * example to send form data
-# data = keyauthapp.webhook("WebhookID", "", "type=init&name=test&ownerid=j9Gj0FTemM", "application/x-www-form-urlencoded")
-
-# * example to send JSON
-# data = keyauthapp.webhook("WebhookID", "", "{\"content\": \"webhook message here\",\"embeds\": null}", "application/json")
-
-# * Get chat messages
-# messages = keyauthapp.chatGet("CHANNEL")
-
-# Messages = ""
-# for i in range(len(messages)):
-# Messages += datetime.utcfromtimestamp(int(messages[i]["timestamp"])).strftime('%Y-%m-%d %H:%M:%S') + " - " + messages[i]["author"] + ": " + messages[i]["message"] + "\n"
-
-# print("\n\n" + Messages)
-
-# * Send chat message
-# keyauthapp.chatSend("MESSAGE", "CHANNEL")
-
-# * Add Application Information to Title
-# os.system(f"cls & title KeyAuth Python Example - Total Users: {keyauthapp.app_data.numUsers} - Online Users: {keyauthapp.app_data.onlineUsers} - Total Keys: {keyauthapp.app_data.numKeys}")
-
-# * Auto-Login Example (THIS IS JUST AN EXAMPLE --> YOU WILL HAVE TO EDIT THE CODE PROBABLY)
-# 1. Checking and Reading JSON
-
-#### Note: Remove the ''' on line 151 and 226
 
 '''try:
     if os.path.isfile('auth.json'): #Checking if the auth file exist
@@ -234,14 +174,11 @@ except Exception as e: #Error stuff
     print(e)
     os._exit(1)'''
 
-# endregion
-
 
 print("\nUser data: ")
 print("Username: " + keyauthapp.user_data.username)
 print("IP address: " + keyauthapp.user_data.ip)
 print("Hardware-Id: " + keyauthapp.user_data.hwid)
-# print("Subcription: " + keyauthapp.user_data.subscription) ## Print Subscription "ONE" name
 
 subs = keyauthapp.user_data.subscriptions  # Get all Subscription names, expiry, and timeleft
 for i in range(len(subs)):
@@ -252,20 +189,9 @@ for i in range(len(subs)):
 
     print(f"[{i + 1} / {len(subs)}] | Subscription: {sub} - Expiry: {expiry} - Timeleft: {timeleft}")
 
-onlineUsers = keyauthapp.fetchOnline()
-OU = ""  # KEEP THIS EMPTY FOR NOW, THIS WILL BE USED TO CREATE ONLINE USER STRING.
-if onlineUsers is None:
-    OU = "No online users"
-else:
-    for i in range(len(onlineUsers)):
-        OU += onlineUsers[i]["credential"] + " "
-
-print("\n" + OU + "\n")
-
 print("Created at: " + datetime.utcfromtimestamp(int(keyauthapp.user_data.createdate)).strftime('%Y-%m-%d %H:%M:%S'))
 print("Last login at: " + datetime.utcfromtimestamp(int(keyauthapp.user_data.lastlogin)).strftime('%Y-%m-%d %H:%M:%S'))
 print("Expires at: " + datetime.utcfromtimestamp(int(keyauthapp.user_data.expires)).strftime('%Y-%m-%d %H:%M:%S'))
-print(f"Current Session Validation Status: {keyauthapp.check()}")
-print("Exiting in 10 secs....")
-sleep(10)
+print("\nExiting in five seconds..")
+sleep(5)
 os._exit(1)
