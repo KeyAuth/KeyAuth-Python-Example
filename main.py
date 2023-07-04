@@ -46,21 +46,12 @@ def getchecksum():
 
 
 keyauthapp = api(
-    name = "", #App name (Manage Applications --> Application name)
-    ownerid = "", #Owner ID (Account-Settings --> OwnerID)
-    secret = "", #App secret(Manage Applications --> App credentials code)
+    name = "",
+    ownerid = "",
+    secret = "",
     version = "1.0",
     hash_to_check = getchecksum()
 )
-
-print(f"""
-App data:
-Number of users: {keyauthapp.app_data.numUsers}
-Number of online users: {keyauthapp.app_data.onlineUsers}
-Number of keys: {keyauthapp.app_data.numKeys}
-Application Version: {keyauthapp.app_data.app_ver}
-Customer panel link: {keyauthapp.app_data.customer_panel}
-""")
 
 def answer():
     try:

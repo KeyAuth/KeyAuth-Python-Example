@@ -96,7 +96,9 @@ class api:
 
         self.sessionid = json["sessionid"]
         self.initialized = True
-        self.__load_app_data(json["appinfo"])
+        
+        if json["newSession"]:
+            time.sleep(0.1)
 
     def register(self, user, password, license, hwid=None):
         self.checkinit()
@@ -408,7 +410,24 @@ class api:
                 return json["users"]
         else:
             return None
+            
+    def fetchStats(self):
+        self.checkinit()
 
+        post_data = {
+            "type": "fetchStats",
+            "sessionid": self.sessionid,
+            "name": self.name,
+            "ownerid": self.ownerid
+        }
+
+        response = self.__do_request(post_data)
+
+        json = jsond.loads(response)
+
+        if json["success"]:
+            self.__load_app_data(json["appinfo"])
+            
     def chatGet(self, channel):
         self.checkinit()
 

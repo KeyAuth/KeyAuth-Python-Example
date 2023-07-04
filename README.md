@@ -72,6 +72,7 @@ You don't need to add any code to initalize. KeyAuth will initalize when the ins
 ## **Display application information**
 
 ```py
+keyauthapp.fetchStats()
 print(f"""
 App data:
 Number of users: {keyauthapp.app_data.numUsers}
