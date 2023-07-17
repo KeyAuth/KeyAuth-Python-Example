@@ -495,7 +495,30 @@ class api:
         else:
             print(json["message"])
             time.sleep(3)
-            os._exit(1)        
+            os._exit(1)  
+
+    def logout(self):
+        self.checkinit()
+
+        post_data = {
+            "type": "logout",
+            "sessionid": self.sessionid,
+            "name": self.name,
+            "ownerid": self.ownerid
+        }
+
+        response = self.__do_request(post_data)
+
+        json = jsond.loads(response)
+
+        if json["success"]:
+            print("Successfully logged out")
+            time.sleep(3)
+            os._exit(1)
+        else:
+            print(json["message"])
+            time.sleep(3)
+            os._exit(1)         
             
     def __do_request(self, post_data):
         try:
