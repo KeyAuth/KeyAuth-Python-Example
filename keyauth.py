@@ -527,6 +527,7 @@ class api:
             )
             
             key = self.secret if post_data["type"] == "init" else self.enckey
+            if post_data["type"] == "log": return response.text
                         
             client_computed = hmac.new(key.encode('utf-8'), response.text.encode('utf-8'), hashlib.sha256).hexdigest()
             
