@@ -226,6 +226,15 @@ Function only works after login.
 keyauthapp.ban()
 ```
 
+## **Logout session**
+
+Logout the users session and close the application. 
+
+This only works if the user is authenticated (logged in)
+```py
+keyauthapp.logout()
+```
+
 ## **Server-sided webhooks**
 
 Tutorial video https://www.youtube.com/watch?v=ENRaNPPYJbc
