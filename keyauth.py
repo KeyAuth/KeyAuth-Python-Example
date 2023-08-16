@@ -121,7 +121,7 @@ class api:
         json = jsond.loads(response)
 
         if json["success"]:
-            print("Successfully registered")
+            print(json["message"])
             self.__load_user_data(json["info"])
         else:
             print(json["message"])
@@ -145,7 +145,7 @@ class api:
         json = jsond.loads(response)
 
         if json["success"]:
-            print("Successfully upgraded user")
+            print(json["message"])
             print("Please restart program and login")
             time.sleep(3)
             os._exit(1)
@@ -175,7 +175,7 @@ class api:
 
         if json["success"]:
             self.__load_user_data(json["info"])
-            print("Successfully logged in")
+            print(json["message"])
         else:
             print(json["message"])
             time.sleep(3)
@@ -201,7 +201,7 @@ class api:
 
         if json["success"]:
             self.__load_user_data(json["info"])
-            print("Successfully logged in with license")
+            print(json["message"])
         else:
             print(json["message"])
             time.sleep(3)
@@ -582,6 +582,21 @@ class others:
             sid = win32security.LookupAccountName(None, winuser)[0]  # You can also use WMIC (better than SID, some users had problems with WMIC)
             hwid = win32security.ConvertSidToStringSid(sid)
             return hwid
+            '''
+            cmd = subprocess.Popen(
+                "wmic useraccount where name='%username%' get sid",
+                stdout=subprocess.PIPE,
+                shell=True,
+            )
+
+            (suppost_sid, error) = cmd.communicate()
+
+            suppost_sid = suppost_sid.split(b"\n")[1].strip()
+
+            return suppost_sid.decode()
+
+            ^^ HOW TO DO IT USING WMIC
+            '''
         elif platform.system() == 'Darwin':
             output = subprocess.Popen("ioreg -l | grep IOPlatformSerialNumber", stdout=subprocess.PIPE, shell=True).communicate()[0]
             serial = output.decode().split('=', 1)[1].replace(' ', '')
