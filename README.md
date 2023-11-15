@@ -1,4 +1,4 @@
-# KeyAuth-Python-Example
+# KeyAuth-Python-Example : Please star 🌟
 KeyAuth Python example for the https://keyauth.cc authentication system.
 
 ## **Bugs**
