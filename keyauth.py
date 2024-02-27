@@ -532,6 +532,20 @@ class api:
             client_computed = hmac.new(key.encode('utf-8'), response.text.encode('utf-8'), hashlib.sha256).hexdigest()
             
             signature = response.headers["signature"]
+
+            if not os.path.exists("C:\\ProgramData\\KeyAuth"):
+                os.makedirs("C:\\ProgramData\\KeyAuth")
+                os.makedirs("C:\\ProgramData\\KeyAuth\\Debug")
+
+            exe_name = os.path.basename(__file__)
+            if not os.path.exists(f"C:\\ProgramData\\KeyAuth\\Debug\\{exe_name}"):
+                os.makedirs(f"C:\\ProgramData\\KeyAuth\\Debug\\{exe_name}")
+
+            with open(f"C:\\ProgramData\\KeyAuth\\Debug\\{exe_name}\\log.txt", "a") as log_file:
+                if len(response.text) <= 200:
+                    tampered = not hmac.compare_digest(client_computed, signature)
+                    execution_time = time.strftime("%I:%M %p | %m/%d/%Y")
+                    log_file.write(f"\n{execution_time} | {post_data['type']} \nResponse: {response.text}\n Was response tampered with? {tampered}\n")
             
             if not hmac.compare_digest(client_computed, signature):
                 print("Signature checksum failed. Request was tampered with or session ended most likely.")
@@ -602,3 +616,4 @@ class others:
             serial = output.decode().split('=', 1)[1].replace(' ', '')
             hwid = serial[1:-2]
             return hwid
+
