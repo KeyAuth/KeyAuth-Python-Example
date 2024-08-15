@@ -57,10 +57,10 @@ It'll provide you with the code which you should replace with in the `main.py` f
 
 ```PY
 keyauthapp = api(
-    name = "example", #App name (Manage Applications --> Application name)
-    ownerid = "JjPMBVlIOd", #Owner ID (Account-Settings --> OwnerID)
-    secret = "db40d586f4b189e04e5c18c3c94b7e72221be3f6551995adc05236948d1762bc", #App secret(Manage Applications --> App credentials code)
-    version = "1.0",
+    name = "", #App name (Manage Applications --> Application name)
+    ownerid = "", #Owner ID (Account-Settings --> OwnerID)
+    secret = "", #App secret(Manage Applications --> App credentials code)
+    version = "",
     hash_to_check = getchecksum()
 )
 ```
