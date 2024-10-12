@@ -524,8 +524,8 @@ class api:
             # Get the current time
             current_time = datetime.now().timestamp()
             
-            # Check if the timestamp is older than 15 seconds
-            if current_time - unix_timestamp > 15:
+            # Check if the timestamp is older than 20 seconds
+            if current_time - unix_timestamp > 20:
                 print("Timestamp OLD")
                 time.sleep(3)
                 os._exit(1)
