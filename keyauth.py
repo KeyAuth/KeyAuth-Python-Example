@@ -2,11 +2,10 @@ import os
 import json as jsond  # json
 import time  # sleep before exit
 import binascii  # hex encoding
-from uuid import uuid4  # gen random guid
 import platform  # check platform
 import subprocess  # needed for mac device
-import hmac # signature checksum
-import hashlib # signature checksum
+from datetime import datetime
+from discord_interactions import verify_key # used for signature verification
 
 try:
     if os.name == 'nt':
@@ -28,19 +27,17 @@ except ModuleNotFoundError:
 
 class api:
 
-    name = ownerid = secret = version = hash_to_check = ""
+    name = ownerid = version = hash_to_check = ""
 
-    def __init__(self, name, ownerid, secret, version, hash_to_check):
-        if len(ownerid) != 10 and len(secret) != 64:
-            print("Go to Manage Applications on dashboard, copy python code, and replace code in main.py with that")
+    def __init__(self, name, ownerid, version, hash_to_check):
+        if len(ownerid) != 10:
+            print("Visit https://keyauth.cc/app/, copy Pthon code, and replace code in main.py with that")
             time.sleep(3)
             os._exit(1)
     
         self.name = name
 
         self.ownerid = ownerid
-
-        self.secret = secret
 
         self.version = version
         self.hash_to_check = hash_to_check
@@ -54,16 +51,11 @@ class api:
             print("You've already initialized!")
             time.sleep(3)
             os._exit(1)
-
-        sent_key = str(uuid4())[:16]
-        
-        self.enckey = sent_key + "-" + self.secret
         
         post_data = {
             "type": "init",
             "ver": self.version,
             "hash": self.hash_to_check,
-            "enckey": sent_key,
             "name": self.name,
             "ownerid": self.ownerid
         }
@@ -96,9 +88,6 @@ class api:
 
         self.sessionid = json["sessionid"]
         self.initialized = True
-        
-        if json["newSession"]:
-            time.sleep(0.1)
 
     def register(self, user, password, license, hwid=None):
         self.checkinit()
@@ -523,15 +512,23 @@ class api:
     def __do_request(self, post_data):
         try:
             response = requests.post(
-                "https://keyauth.win/api/1.2/", data=post_data, timeout=10
+                "https://keyauth.win/api/1.3/", data=post_data, timeout=10
             )
             
-            key = self.secret if post_data["type"] == "init" else self.enckey
-            if post_data["type"] == "log": return response.text
-                        
-            client_computed = hmac.new(key.encode('utf-8'), response.text.encode('utf-8'), hashlib.sha256).hexdigest()
+            if post_data["type"] == "log" or post_data["type"] == "file": return response.text
             
-            signature = response.headers["signature"]
+            signature = response.headers["x-signature-ed25519"]
+            timestamp = response.headers["x-signature-timestamp"]
+            
+            unix_timestamp = int(timestamp)
+            # Get the current time
+            current_time = datetime.now().timestamp()
+            
+            # Check if the timestamp is older than 15 seconds
+            if current_time - unix_timestamp > 15:
+                print("Timestamp OLD")
+                time.sleep(3)
+                os._exit(1)
 
             if not os.path.exists("C:\\ProgramData\\KeyAuth"):
                 os.makedirs("C:\\ProgramData\\KeyAuth")
@@ -543,11 +540,10 @@ class api:
 
             with open(f"C:\\ProgramData\\KeyAuth\\Debug\\{exe_name}\\log.txt", "a") as log_file:
                 if len(response.text) <= 200:
-                    tampered = not hmac.compare_digest(client_computed, signature)
                     execution_time = time.strftime("%I:%M %p | %m/%d/%Y")
-                    log_file.write(f"\n{execution_time} | {post_data['type']} \nResponse: {response.text}\n Was response tampered with? {tampered}\n")
+                    log_file.write(f"\n{execution_time} | {post_data['type']} \nResponse: {response.text}")
             
-            if not hmac.compare_digest(client_computed, signature):
+            if not verify_key(response.text.encode('utf-8'), signature, timestamp, '5586b4bc69c7a4b487e4563a4cd96afd39140f919bd31cea7d1c6a1e8439422b'):
                 print("Signature checksum failed. Request was tampered with or session ended most likely.")
                 print("Response: " + response.text)
                 time.sleep(3)

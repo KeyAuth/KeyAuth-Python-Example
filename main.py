@@ -46,10 +46,9 @@ def getchecksum():
 
 
 keyauthapp = api(
-    name = "",
-    ownerid = "",
-    secret = "",
-    version = "1.0",
+    name = "", # Application Name
+    ownerid = "", # Owner ID
+    version = "1.0", # Application Version
     hash_to_check = getchecksum()
 )
 
