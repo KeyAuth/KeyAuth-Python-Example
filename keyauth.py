@@ -522,7 +522,7 @@ class api:
             
             unix_timestamp = int(timestamp)
             # Get the current time
-            current_time = datetime.now().timestamp()
+            current_time = int(datetime.utcnow().timestamp())
             
             # Check if the timestamp is older than 20 seconds
             if current_time - unix_timestamp > 20:
