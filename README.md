@@ -76,14 +76,14 @@ You don't need to add any code to initalize. KeyAuth will initalize when the ins
 ## **Display application information**
 
 ```py
-keyauthapp.fetchStats()
+keyauth = keyauthapp.fetchStats()
 print(f"""
 App data:
-Number of users: {keyauthapp.app_data.numUsers}
-Number of online users: {keyauthapp.app_data.onlineUsers}
-Number of keys: {keyauthapp.app_data.numKeys}
-Application Version: {keyauthapp.app_data.app_ver}
-Customer panel link: {keyauthapp.app_data.customer_panel}
+Number of users: {keyauth['appinfo']['numUsers']}
+Number of online users: {keyauth['appinfo']['numOnlineUsers']}
+Number of keys: {keyauth['appinfo']['numKeys']}
+Application Version: {keyauth['appinfo']['version']}
+Customer panel link: {keyauth['appinfo']['customerPanelLink']}
 """)
 ```
 
@@ -100,9 +100,8 @@ print(f"Current Session Validation Status: {keyauthapp.check()}")
 Check if HWID or IP Address is blacklisted. You can add this if you want, just to make sure nobody can open your program for less than a second if they're blacklisted. Though, if you don't mind a blacklisted user having the program for a few seconds until they try to login and register, and you care about having the quickest program for your users, you shouldn't use this function then. If a blacklisted user tries to login/register, the KeyAuth server will check if they're blacklisted and deny entry if so. So the check blacklist function is just auxiliary function that's optional.
 
 ```py
-if keyauthapp.checkblacklist():
+if keyauthapp.check_blacklist():
     print("You've been blacklisted from our application.")
-    os._exit(1)
 ```
 
 ## **Login with username/password**
@@ -149,22 +148,34 @@ keyauthapp.license(key)
 Show information for current logged-in user.
 
 ```py
+
+# you can use login also i just using it for guide
+key = input('Enter your license: ')
+keyauth = keyauthapp.license(key)
+
 print("\nUser data: ")
-print("Username: " + keyauthapp.user_data.username)
-print("IP address: " + keyauthapp.user_data.ip)
-print("Hardware-Id: " + keyauthapp.user_data.hwid)
+print("Username: " + keyauth['username'])
+print("IP address: " + keyauth['ip'])
+print("Hardware-Id: " + keyauth['hwid'])
 
-subs = keyauthapp.user_data.subscriptions  # Get all Subscription names, expiry, and timeleft
-for i in range(len(subs)):
-    sub = subs[i]["subscription"]  # Subscription from every Sub
-    expiry = datetime.utcfromtimestamp(int(subs[i]["expiry"])).strftime(
-        '%Y-%m-%d %H:%M:%S')  # Expiry date from every Sub
-    timeleft = subs[i]["timeleft"]  # Timeleft from every Sub
+# Loop through subscriptions list to get subscription details
+for data in keyauth['subscriptions']:
+    subs = data['subscription']
+    key = data['key']
+    expiry = datetime.datetime.fromtimestamp(int(data["expiry"]), datetime.UTC).strftime('%Y-%m-%d %H:%M:%S')  # Expiry date for each subscription
+    timeleft = data["timeleft"]  # Time left for each subscription
+    
+    print(f"Subscription: {subs}")
+    print(f"Key: {key}")
+    print(f"Expiry: {expiry}")
+    print(f"Time left: {timeleft}\n")
 
-    print(f"[{i + 1} / {len(subs)}] | Subscription: {sub} - Expiry: {expiry} - Timeleft: {timeleft}")
-print("Created at: " + datetime.utcfromtimestamp(int(keyauthapp.user_data.createdate)).strftime('%Y-%m-%d %H:%M:%S'))
-print("Last login at: " + datetime.utcfromtimestamp(int(keyauthapp.user_data.lastlogin)).strftime('%Y-%m-%d %H:%M:%S'))
-print("Expires at: " + datetime.utcfromtimestamp(int(keyauthapp.user_data.expires)).strftime('%Y-%m-%d %H:%M:%S'))
+# Print creation, last login, and expiration dates
+print("Created at: " + datetime.datetime.fromtimestamp(int(keyauth['create_date']), datetime.UTC).strftime('%Y-%m-%d %H:%M:%S'))
+print("Last login at: " + datetime.datetime.fromtimestamp(int(keyauth['last_login']), datetime.UTC).strftime('%Y-%m-%d %H:%M:%S'))
+print("Expires at: " + datetime.datetime.fromtimestamp(int(keyauth['expire']), datetime.UTC).strftime('%Y-%m-%d %H:%M:%S'))
+
+# Print session validation status
 print(f"Current Session Validation Status: {keyauthapp.check()}")
 ```
 
@@ -172,8 +183,8 @@ print(f"Current Session Validation Status: {keyauthapp.check()}")
 
 ```py
 onlineUsers = keyauthapp.fetchOnline()
-OU = ""  # KEEP THIS EMPTY FOR NOW, THIS WILL BE USED TO CREATE ONLINE USER STRING.
-if onlineUsers is None:
+OU = ""
+if not onlineUsers:
     OU = "No online users"
 else:
     for i in range(len(onlineUsers)):

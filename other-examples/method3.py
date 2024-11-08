@@ -1,3 +1,4 @@
+
 import os
 import json as jsond  # json
 import time  # sleep before exit
@@ -5,7 +6,7 @@ import binascii  # hex encoding
 import platform  # check platform
 import subprocess  # needed for mac device
 from datetime import datetime
-from discord_interactions import verify_key # used for signature verification
+# from discord_interactions import verify_key # used for signature verification
 
 try:
     if os.name == 'nt':
