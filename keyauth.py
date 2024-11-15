@@ -4,7 +4,7 @@ import time  # sleep before exit
 import binascii  # hex encoding
 import platform  # check platform
 import subprocess  # needed for mac device
-from datetime import datetime
+from datetime import datetime, timedelta
 from discord_interactions import verify_key # used for signature verification
 
 try:
@@ -512,44 +512,54 @@ class api:
     def __do_request(self, post_data):
         try:
             response = requests.post(
-                "https://keyauth.win/api/1.3/", data=post_data, timeout=10
+            "https://keyauth.win/api/1.3/", data=post_data, timeout=10
             )
-            
-            if post_data["type"] == "log" or post_data["type"] == "file": return response.text
-            
-            signature = response.headers["x-signature-ed25519"]
-            timestamp = response.headers["x-signature-timestamp"]
-            
-            unix_timestamp = int(timestamp)
-            # Get the current time
-            current_time = int(datetime.utcnow().timestamp())
-            
-            # Check if the timestamp is older than 20 seconds
-            if current_time - unix_timestamp > 20:
-                print("Timestamp OLD")
+
+            if post_data["type"] == "log" or post_data["type"] == "file":
+                return response.text
+
+            # Get the signature and timestamp from the headers
+            signature = response.headers.get("x-signature-ed25519")
+            timestamp = response.headers.get("x-signature-timestamp")
+
+            if not signature or not timestamp:
+                print("Missing headers for signature verification.")
                 time.sleep(3)
                 os._exit(1)
 
+            server_time = datetime.utcfromtimestamp(int(timestamp))
+            current_time = datetime.utcnow()
+
+            buffer_seconds = 5
+            time_difference = current_time - server_time
+
+            if time_difference > timedelta(seconds=20 + buffer_seconds):
+                print("Timestamp is too old (exceeded 20 seconds + buffer).")
+                time.sleep(3)
+                os._exit(1)
+
+            # Proceed with creating debug folders and logging
             if not os.path.exists("C:\\ProgramData\\KeyAuth"):
-                os.makedirs("C:\\ProgramData\\KeyAuth")
                 os.makedirs("C:\\ProgramData\\KeyAuth\\Debug")
 
             exe_name = os.path.basename(__file__)
-            if not os.path.exists(f"C:\\ProgramData\\KeyAuth\\Debug\\{exe_name}"):
-                os.makedirs(f"C:\\ProgramData\\KeyAuth\\Debug\\{exe_name}")
+            log_dir = f"C:\\ProgramData\\KeyAuth\\Debug\\{exe_name}"
+            if not os.path.exists(log_dir):
+                os.makedirs(log_dir)
 
-            with open(f"C:\\ProgramData\\KeyAuth\\Debug\\{exe_name}\\log.txt", "a") as log_file:
+            with open(f"{log_dir}\\log.txt", "a") as log_file:
                 if len(response.text) <= 200:
                     execution_time = time.strftime("%I:%M %p | %m/%d/%Y")
                     log_file.write(f"\n{execution_time} | {post_data['type']} \nResponse: {response.text}")
-            
+
             if not verify_key(response.text.encode('utf-8'), signature, timestamp, '5586b4bc69c7a4b487e4563a4cd96afd39140f919bd31cea7d1c6a1e8439422b'):
                 print("Signature checksum failed. Request was tampered with or session ended most likely.")
                 print("Response: " + response.text)
                 time.sleep(3)
-                os._exit(1) 
-            
+                os._exit(1)
+
             return response.text
+
         except requests.exceptions.Timeout:
             print("Request timed out. Server is probably down/slow at the moment")
 
@@ -612,4 +622,3 @@ class others:
             serial = output.decode().split('=', 1)[1].replace(' ', '')
             hwid = serial[1:-2]
             return hwid
-
