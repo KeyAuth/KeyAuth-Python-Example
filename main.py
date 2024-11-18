@@ -17,7 +17,7 @@ import platform
 import os
 import hashlib
 from time import sleep
-from datetime import datetime
+from datetime import datetime, UTC
 
 # import json as jsond
 # ^^ only for auto login/json writing/reading
@@ -173,15 +173,15 @@ print("Hardware-Id: " + keyauthapp.user_data.hwid)
 subs = keyauthapp.user_data.subscriptions  # Get all Subscription names, expiry, and timeleft
 for i in range(len(subs)):
     sub = subs[i]["subscription"]  # Subscription from every Sub
-    expiry = datetime.utcfromtimestamp(int(subs[i]["expiry"])).strftime(
+    expiry = datetime.fromtimestamp(int(subs[i]["expiry"]), UTC).strftime(
         '%Y-%m-%d %H:%M:%S')  # Expiry date from every Sub
     timeleft = subs[i]["timeleft"]  # Timeleft from every Sub
 
     print(f"[{i + 1} / {len(subs)}] | Subscription: {sub} - Expiry: {expiry} - Timeleft: {timeleft}")
 
-print("Created at: " + datetime.utcfromtimestamp(int(keyauthapp.user_data.createdate)).strftime('%Y-%m-%d %H:%M:%S'))
-print("Last login at: " + datetime.utcfromtimestamp(int(keyauthapp.user_data.lastlogin)).strftime('%Y-%m-%d %H:%M:%S'))
-print("Expires at: " + datetime.utcfromtimestamp(int(keyauthapp.user_data.expires)).strftime('%Y-%m-%d %H:%M:%S'))
+print("Created at: " + datetime.fromtimestamp(int(keyauthapp.user_data.createdate), UTC).strftime('%Y-%m-%d %H:%M:%S'))
+print("Last login at: " + datetime.fromtimestamp(int(keyauthapp.user_data.lastlogin), UTC).strftime('%Y-%m-%d %H:%M:%S'))
+print("Expires at: " + datetime.fromtimestamp(int(keyauthapp.user_data.expires), UTC).strftime('%Y-%m-%d %H:%M:%S'))
 print("\nExiting in five seconds..")
 sleep(5)
 os._exit(1)
