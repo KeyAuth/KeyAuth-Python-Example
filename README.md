@@ -44,7 +44,7 @@ For API, `keyauth.cc` will not work because I purposefully blocked it on there s
 You can either use Pyinstaller or Nuitka.
 
 Links:
-- Nutika: https://nuitka.net/
+- Nuitka: https://nuitka.net/
 - Pyinstaller: https://pyinstaller.org/
 
 Pyinstaller:
