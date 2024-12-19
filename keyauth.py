@@ -4,8 +4,11 @@ import time  # sleep before exit
 import binascii  # hex encoding
 import platform  # check platform
 import subprocess  # needed for mac device
-from datetime import datetime, timedelta
+import qrcode
+from datetime import datetime, timezone, timedelta
 from discord_interactions import verify_key # used for signature verification
+from PIL import Image
+
 
 try:
     if os.name == 'nt':
@@ -143,7 +146,7 @@ class api:
             time.sleep(3)
             os._exit(1)
 
-    def login(self, user, password, hwid=None):
+    def login(self, user, password, code=None, hwid=None):
         self.checkinit()
         if hwid is None:
             hwid = others.get_hwid()
@@ -155,8 +158,11 @@ class api:
             "hwid": hwid,
             "sessionid": self.sessionid,
             "name": self.name,
-            "ownerid": self.ownerid
+            "ownerid": self.ownerid,
         }
+        
+        if code is not None:
+            post_data["code"] = code
 
         response = self.__do_request(post_data)
 
@@ -170,7 +176,7 @@ class api:
             time.sleep(3)
             os._exit(1)
 
-    def license(self, key, hwid=None):
+    def license(self, key, code=None, hwid=None):
         self.checkinit()
         if hwid is None:
             hwid = others.get_hwid()
@@ -183,6 +189,9 @@ class api:
             "name": self.name,
             "ownerid": self.ownerid
         }
+        
+        if code is not None:
+            post_data["code"] = code
 
         response = self.__do_request(post_data)
 
@@ -507,15 +516,87 @@ class api:
         else:
             print(json["message"])
             time.sleep(3)
-            os._exit(1)         
+            os._exit(1)  
+            
+    def enable2fa(self, code=None):
+        self.checkinit()
+        
+        post_data = {
+            "type": "2faenable",
+            "sessionid": self.sessionid,
+            "name": self.name,
+            "ownerid": self.ownerid,
+            "code": code
+        }       
+        
+        response = self.__do_request(post_data)
+        
+        json = jsond.loads(response)
+        
+        if json["success"]:
+            if code is None:
+                # First request: Display the 2FA secret code
+                print(f"Your 2FA secret code is: {json['2fa']['secret_code']}")
+                qr_code = json['2fa']['QRCode']
+                self.display_qr_code(qr_code)
+                code_input = input("Enter the 6 digit 2fa code to enable 2fa: ")
+                self.enable2fa(code_input);
+            else:
+                # Second request: Confirm successful 2FA activation
+                print("2FA has been successfully enabled!")
+                time.sleep(3)
+        else:
+            print(f"Error: {json['message']}")
+            time.sleep(3)
+            os._exit(1)
+            
+    def disable2fa(self, code=None):
+        self.checkinit()
+        
+        code = input("Enter the 6 digit 2fa code to disable 2fa: ")
+        
+        post_data = {
+            "type": "2fadisable",
+            "sessionid": self.sessionid,
+            "name": self.name,
+            "ownerid": self.ownerid,
+            "code": code
+        }
+        
+        response = self.__do_request(post_data)
+        
+        json = jsond.loads(response)
+        
+        print(json['message'])
+        time.sleep(3)
+        
+            
+    def display_qr_code(self, qr_code_url):
+            # Generate QR code image
+            qr = qrcode.QRCode(
+                version=1,
+                error_correction=qrcode.constants.ERROR_CORRECT_L,
+                box_size=10,
+                border=4,
+            )
+
+            # Add the QR code URL data
+            qr.add_data(qr_code_url)
+            qr.make(fit=True)
+
+            # Create an image from the QR code
+            img = qr.make_image(fill='black', back_color='white')
+
+            # Display the QR code image
+            img.show()            
             
     def __do_request(self, post_data):
         try:
             response = requests.post(
-            "https://keyauth.win/api/1.3/", data=post_data, timeout=10
+                "https://keyauth.win/api/1.3/", data=post_data, timeout=10
             )
 
-            if post_data["type"] == "log" or post_data["type"] == "file":
+            if post_data["type"] == "log" or post_data["type"] == "file" or post_data["type"] == "2faenable" or post_data["type"] == "2fadisable":
                 return response.text
 
             # Get the signature and timestamp from the headers
@@ -527,8 +608,12 @@ class api:
                 time.sleep(3)
                 os._exit(1)
 
-            server_time = datetime.utcfromtimestamp(int(timestamp))
-            current_time = datetime.utcnow()
+            server_time = datetime.fromtimestamp(int(timestamp), timezone.utc)
+            current_time = datetime.now(timezone.utc)
+            
+            #print(f"Server Timestamp (UTC seconds): {timestamp}")
+            #print(f"Server Time (UTC seconds): {server_time.timestamp()}")
+            #print(f"Current Time (UTC seconds): {current_time.timestamp()}")
 
             buffer_seconds = 5
             time_difference = current_time - server_time
@@ -538,31 +623,17 @@ class api:
                 time.sleep(3)
                 os._exit(1)
 
-            # Proceed with creating debug folders and logging
-            if not os.path.exists("C:\\ProgramData\\KeyAuth"):
-                os.makedirs("C:\\ProgramData\\KeyAuth\\Debug")
-
-            exe_name = os.path.basename(__file__)
-            log_dir = f"C:\\ProgramData\\KeyAuth\\Debug\\{exe_name}"
-            if not os.path.exists(log_dir):
-                os.makedirs(log_dir)
-
-            with open(f"{log_dir}\\log.txt", "a") as log_file:
-                if len(response.text) <= 200:
-                    execution_time = time.strftime("%I:%M %p | %m/%d/%Y")
-                    log_file.write(f"\n{execution_time} | {post_data['type']} \nResponse: {response.text}")
-
             if not verify_key(response.text.encode('utf-8'), signature, timestamp, '5586b4bc69c7a4b487e4563a4cd96afd39140f919bd31cea7d1c6a1e8439422b'):
                 print("Signature checksum failed. Request was tampered with or session ended most likely.")
-                print("Response: " + response.text)
                 time.sleep(3)
                 os._exit(1)
 
             return response.text
 
-        except requests.exceptions.Timeout:
+        except requests.exceptions.Timeout: 
             print("Request timed out. Server is probably down/slow at the moment")
-
+                
+            
     class application_data_class:
         numUsers = numKeys = app_ver = customer_panel = onlineUsers = ""
 
