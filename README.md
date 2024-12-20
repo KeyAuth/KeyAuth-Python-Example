@@ -230,6 +230,22 @@ Function only works after login.
 keyauthapp.ban()
 ```
 
+## **Enable Two Factor Authentication (2fa)**
+
+Enable two factor authentication (2fa) on a client account.
+
+```py
+keyauthapp.enable2fa()
+```
+
+## **Disable Two Factor Authentication (2fa)**
+
+Disable two factor authentication (2fa) on a client account.
+
+```py
+keyauthapp.disable2fa()
+```
+
 ## **Logout session**
 
 Logout the users session and close the application. 
