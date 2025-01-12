@@ -1,3 +1,5 @@
 requests
 pywin32
 discord-interactions
+qrcode
+pillow
