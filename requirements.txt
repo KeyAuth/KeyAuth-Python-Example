@@ -1,5 +1,5 @@
 requests
-pywin32
+pywin32; platform_system == "Windows"
 discord-interactions
 qrcode
 pillow

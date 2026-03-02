@@ -2,6 +2,8 @@
 
 KeyAuth Python example SDK for https://keyauth.cc license key API auth.
 
+Credits: Nigel (Discord: chefendpoint, Telegram: ELF_Nigel)
+
 ## **Bugs**
 
 If you are using our example with no significant changes, and you are having problems, please Report Bug here https://keyauth.fdback.io
@@ -31,7 +33,29 @@ Thank you for your compliance, we work hard on the development of KeyAuth and do
 KeyAuth is a powerful cloud-based authentication system designed to protect your software from piracy and unauthorized access. With KeyAuth, you can implement secure licensing, user management, and subscription systems in minutes. Client SDKs available for [C#](https://github.com/KeyAuth/KeyAuth-CSHARP-Example), [C++](https://github.com/KeyAuth/KeyAuth-CPP-Example), [Python](https://github.com/KeyAuth/KeyAuth-Python-Example), [Java](https://github.com/KeyAuth-Archive/KeyAuth-JAVA-api), [JavaScript](https://github.com/mazkdevf/KeyAuth-JS-Example), [VB.NET](https://github.com/KeyAuth/KeyAuth-VB-Example), [PHP](https://github.com/KeyAuth/KeyAuth-PHP-Example), [Rust](https://github.com/KeyAuth/KeyAuth-Rust-Example), [Go](https://github.com/mazkdevf/KeyAuth-Go-Example), [Lua](https://github.com/mazkdevf/KeyAuth-Lua-Examples), [Ruby](https://github.com/mazkdevf/KeyAuth-Ruby-Example), and [Perl](https://github.com/mazkdevf/KeyAuth-Perl-Example). KeyAuth has several unique features such as memory streaming, webhook function where you can send requests to API without leaking the API, discord webhook notifications, ban the user securely through the application at your discretion. Feel free to join https://t.me/keyauth if you have questions or suggestions.
 
 > [!TIP]
-> https://vaultcord.com FREE Discord bot to Backup server, members, channels, messages & more. Custom verify page, block alt accounts, VPNs & more.
+> Use the official KeyAuth examples and docs when troubleshooting to ensure your local code matches the latest API expectations.
+
+## Optional client-side delays & lockout helpers
+
+These helpers are client-side only and meant to slow down abuse. They do not replace server-side enforcement.
+
+```py
+# Delay helpers
+api.init_fail_delay()
+api.bad_input_delay()
+api.close_delay()
+
+# Lockout helpers
+if api.lockout_active():
+    print(f"Locked out, try again in {api.lockout_remaining_ms()} ms")
+    exit(1)
+
+# On failed login attempt:
+api.record_login_fail()
+
+# On successful login:
+api.reset_lockout()
+```
 
 ## **Customer connection issues?**
 
