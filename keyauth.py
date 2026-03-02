@@ -4,6 +4,7 @@ import time  # sleep before exit
 import binascii  # hex encoding
 import platform  # check platform
 import subprocess  # needed for mac device
+import threading
 import qrcode
 from datetime import datetime, timezone, timedelta
 from discord_interactions import verify_key # used for signature verification
@@ -31,6 +32,21 @@ except ModuleNotFoundError:
 class api:
 
     name = ownerid = version = hash_to_check = ""
+    init_fail_delay_ms = 1500
+    bad_input_delay_ms = 3000
+    close_delay_ms = 5000
+    _lockout_lock = threading.Lock()
+    _lockout_state = {
+        "fail_count": 0,
+        "first_fail_at": 0.0,
+        "locked_until": 0.0,
+        "last_fail_at": 0.0,
+    }
+    lockout_settings = {
+        "max_attempts": 5,
+        "window_seconds": 120.0,
+        "lockout_seconds": 300.0,
+    }
 
     def __init__(self, name, ownerid, version, hash_to_check):
         if len(ownerid) != 10:
@@ -91,6 +107,68 @@ class api:
 
         self.sessionid = json["sessionid"]
         self.initialized = True
+
+    @staticmethod
+    def init_fail_delay():
+        time.sleep(api.init_fail_delay_ms / 1000.0)
+
+    @staticmethod
+    def bad_input_delay():
+        time.sleep(api.bad_input_delay_ms / 1000.0)
+
+    @staticmethod
+    def close_delay():
+        time.sleep(api.close_delay_ms / 1000.0)
+
+    @staticmethod
+    def lockout_state_snapshot():
+        with api._lockout_lock:
+            return dict(api._lockout_state)
+
+    @staticmethod
+    def lockout_active():
+        with api._lockout_lock:
+            locked_until = api._lockout_state["locked_until"]
+            if locked_until <= 0:
+                return False
+            return time.time() < locked_until
+
+    @staticmethod
+    def lockout_remaining_ms():
+        with api._lockout_lock:
+            locked_until = api._lockout_state["locked_until"]
+            if locked_until <= 0:
+                return 0
+            remaining = locked_until - time.time()
+            if remaining < 0:
+                return 0
+            return int(remaining * 1000)
+
+    @staticmethod
+    def record_login_fail():
+        with api._lockout_lock:
+            now = time.time()
+            api._lockout_state["last_fail_at"] = now
+
+            first_fail_at = api._lockout_state["first_fail_at"]
+            if first_fail_at <= 0 or (now - first_fail_at) > api.lockout_settings["window_seconds"]:
+                api._lockout_state["first_fail_at"] = now
+                api._lockout_state["fail_count"] = 1
+                return
+
+            api._lockout_state["fail_count"] += 1
+            if api._lockout_state["fail_count"] >= api.lockout_settings["max_attempts"]:
+                api._lockout_state["locked_until"] = now + api.lockout_settings["lockout_seconds"]
+
+    @staticmethod
+    def reset_lockout():
+        with api._lockout_lock:
+            api._lockout_state = {
+                "fail_count": 0,
+                "first_fail_at": 0.0,
+                "locked_until": 0.0,
+                "last_fail_at": 0.0,
+            }
 
     def register(self, user, password, license, hwid=None):
         self.checkinit()

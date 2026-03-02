@@ -55,6 +55,11 @@ keyauthapp = api(
 
 def answer():
     try:
+        if api.lockout_active():
+            print(f"Locked out, try again in {api.lockout_remaining_ms()} ms")
+            api.close_delay()
+            os._exit(1)
+
         print("""1.Login
 2.Register
 3.Upgrade
@@ -66,22 +71,26 @@ def answer():
             password = input('Provide password: ')
             code = input('Enter 2fa code: (not using 2fa? Just press enter)')
             keyauthapp.login(user, password, code)
+            api.reset_lockout()
         elif ans == "2":
             user = input('Provide username: ')
             password = input('Provide password: ')
             license = input('Provide License: ')
             keyauthapp.register(user, password, license)
+            api.reset_lockout()
         elif ans == "3":
             user = input('Provide username: ')
             license = input('Provide License: ')
             keyauthapp.upgrade(user, license)
+            api.reset_lockout()
         elif ans == "4":
             key = input('Enter your license: ')
             code = input('Enter 2fa code: (not using 2fa? Just press enter)')
             keyauthapp.license(key, code)
+            api.reset_lockout()
         else:
             print("\nInvalid option")
-            sleep(1)
+            api.bad_input_delay()
             clear()
             answer()
     except KeyboardInterrupt:
