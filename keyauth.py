@@ -60,6 +60,9 @@ class api:
 
         self.version = version
         self.hash_to_check = hash_to_check
+        self._ban_monitor_stop = threading.Event()
+        self._ban_monitor_thread = None
+        self._ban_monitor_detected = False
         self.init()
 
     sessionid = enckey = ""
@@ -450,6 +453,46 @@ class api:
             return True
         else:
             return False
+
+    def start_ban_monitor(self, interval_seconds=120, check_session=True, on_ban=None):
+        if interval_seconds < 1:
+            interval_seconds = 1
+
+        if self._ban_monitor_thread and self._ban_monitor_thread.is_alive():
+            return
+
+        self._ban_monitor_detected = False
+        self._ban_monitor_stop.clear()
+
+        def _loop():
+            while not self._ban_monitor_stop.is_set():
+                if check_session and not self.check():
+                    self._ban_monitor_detected = True
+                    if on_ban:
+                        on_ban()
+                    return
+
+                if self.checkblacklist():
+                    self._ban_monitor_detected = True
+                    if on_ban:
+                        on_ban()
+                    return
+
+                self._ban_monitor_stop.wait(interval_seconds)
+
+        self._ban_monitor_thread = threading.Thread(target=_loop, daemon=True)
+        self._ban_monitor_thread.start()
+
+    def stop_ban_monitor(self):
+        self._ban_monitor_stop.set()
+        if self._ban_monitor_thread and self._ban_monitor_thread.is_alive():
+            self._ban_monitor_thread.join(timeout=2)
+
+    def ban_monitor_running(self):
+        return self._ban_monitor_thread is not None and self._ban_monitor_thread.is_alive()
+
+    def ban_monitor_detected(self):
+        return self._ban_monitor_detected
 
     def log(self, message):
         self.checkinit()
